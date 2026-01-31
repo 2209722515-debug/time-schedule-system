@@ -1,0 +1,723 @@
+/* 基础样式 */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --gray-color: #95a5a6;
+    --border-color: #ddd;
+    --shadow: 0 2px 12px rgba(0,0,0,0.1);
+    --radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 导航栏 */
+.navbar {
+    background: white;
+    box-shadow: var(--shadow);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--dark-color);
+}
+
+.nav-brand i {
+    color: var(--primary-color);
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-user .btn {
+    padding: 8px 20px;
+    font-size: 14px;
+}
+
+/* 卡片样式 */
+.card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+.card h3 {
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 日期选择 */
+.date-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.date-card h3 {
+    color: white;
+}
+
+.date-input-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.date-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 15px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.current-date {
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+#weekDayDisplay {
+    margin-left: 15px;
+    opacity: 0.9;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-secondary {
+    background: var(--light-color);
+    color: var(--dark-color);
+}
+
+.btn-secondary:hover {
+    background: #bdc3c7;
+}
+
+.btn-success {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #27ae60;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #e67e22;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* 管理员卡片 */
+.admin-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.time-setter {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+}
+
+/* 状态选择按钮 */
+.status-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    background: white;
+    color: var(--dark-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.status-btn:hover {
+    border-color: var(--primary-color);
+}
+
+.status-btn.active {
+    border-width: 3px;
+    font-weight: bold;
+}
+
+.status-free.active {
+    border-color: var(--secondary-color);
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--secondary-color);
+}
+
+.status-busy.active {
+    border-color: var(--danger-color);
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+/* 表单样式 */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.time-input,
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 16px;
+}
+
+.time-input:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: 2px solid var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 时间表 */
+.schedule-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stats-badge {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.free-badge {
+    background: rgba(46, 204, 113, 0.2);
+    color: var(--secondary-color);
+}
+
+.busy-badge {
+    background: rgba(231, 76, 60, 0.2);
+    color: var(--danger-color);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.schedule-table th {
+    background: var(--light-color);
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.schedule-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.schedule-table tr:hover {
+    background: #f8f9fa;
+}
+
+.col-time {
+    width: 25%;
+}
+
+.col-status {
+    width: 15%;
+}
+
+.col-admin {
+    width: 25%;
+}
+
+.col-actions {
+    width: 35%;
+}
+
+.status-cell {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    width: fit-content;
+}
+
+.status-free {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--secondary-color);
+}
+
+.status-busy {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+.admin-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--gray-color);
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-tip {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #aaa;
+}
+
+/* 提示框 */
+.alert {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 管理员设置模态框内容 */
+.current-admin-info,
+.change-password-form,
+.add-admin-form,
+.admin-list {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.current-admin-info:last-child,
+.change-password-form:last-child,
+.add-admin-form:last-child,
+.admin-list:last-child {
+    border-bottom: none;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.info-label {
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.info-value {
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.info-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 14px;
+    min-width: 200px;
+}
+
+.info-input:focus {
+    outline: 2px solid var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table th {
+    background: var(--light-color);
+    font-weight: 600;
+}
+
+/* 模态框 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-dialog {
+    background: white;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-dialog.wide {
+    max-width: 800px;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: white;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+/* 快捷操作面板 */
+.quick-actions-panel {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 说明卡片 */
+.help-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.help-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.help-item i {
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-top: 3px;
+}
+
+.help-item h4 {
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+.help-item p {
+    color: var(--gray-color);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* 脚注 */
+.footer {
+    background: var(--dark-color);
+    color: white;
+    padding: 30px 0;
+    margin-top: 50px;
+    text-align: center;
+}
+
+/* 自定义确认对话框 */
+.custom-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.custom-confirm-dialog {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.custom-confirm-content {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+}
+
+.custom-confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.custom-confirm-buttons .btn {
+    min-width: 80px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        min-width: 100%;
+    }
+    
+    .date-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quick-actions {
+        justify-content: center;
+    }
+    
+    .modal-dialog {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .schedule-table th,
+    .schedule-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .status-buttons {
+        flex-direction: column;
+    }
+}

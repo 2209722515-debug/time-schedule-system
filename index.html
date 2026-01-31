@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间管理系统</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-calendar-alt"></i>
+                <span>时间管理系统</span>
+            </div>
+            <div class="nav-user" id="navUser">
+                <!-- 用户信息动态显示 -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container main-container">
+        <!-- 系统状态提示 -->
+        <div class="alert" id="systemAlert">
+            <i class="fas fa-info-circle"></i>
+            <span id="alertMessage">访客模式：仅可查看时间安排</span>
+        </div>
+
+        <!-- 日期选择 -->
+        <div class="card date-card">
+            <h3><i class="far fa-calendar"></i> 选择日期</h3>
+            <div class="date-control">
+                <div class="date-input-group">
+                    <input type="date" id="datePicker" class="date-input">
+                    <div class="quick-actions">
+                        <button onclick="goToday()" class="btn btn-primary">
+                            <i class="fas fa-calendar-day"></i> 今天
+                        </button>
+                        <button onclick="changeDate(-1)" class="btn btn-secondary">
+                            <i class="fas fa-chevron-left"></i> 前一天
+                        </button>
+                        <button onclick="changeDate(1)" class="btn btn-secondary">
+                            后一天 <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="current-date">
+                    <span id="currentDateDisplay"></span>
+                    <span id="weekDayDisplay"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理员面板（登录后显示） -->
+        <div class="card admin-card" id="adminCard" style="display:none;">
+            <div class="admin-header">
+                <h3><i class="fas fa-user-cog"></i> 管理员设置</h3>
+                <button class="btn btn-sm btn-outline" onclick="openAdminSettings()">
+                    <i class="fas fa-cog"></i> 设置
+                </button>
+            </div>
+            
+            <div class="time-setter">
+                <h4><i class="far fa-clock"></i> 添加时间段</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>开始时间：</label>
+                        <input type="time" id="startTime" class="time-input" step="900">
+                    </div>
+                    <div class="form-group">
+                        <label>结束时间：</label>
+                        <input type="time" id="endTime" class="time-input" step="900">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>状态：</label>
+                    <div class="status-buttons">
+                        <button type="button" class="status-btn status-free active" onclick="selectStatus('free')">
+                            空闲
+                        </button>
+                        <button type="button" class="status-btn status-busy" onclick="selectStatus('busy')">
+                            繁忙
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="addSchedule()" class="btn btn-success btn-block">
+                    <i class="fas fa-plus"></i> 添加时间段
+                </button>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="quick-actions-panel">
+                <button onclick="exportData()" class="btn btn-outline btn-sm">
+                    <i class="fas fa-download"></i> 导出数据
+                </button>
+                <label class="btn btn-outline btn-sm">
+                    <i class="fas fa-upload"></i> 导入数据
+                    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+                </label>
+            </div>
+        </div>
+
+        <!-- 时间表显示 -->
+        <div class="card schedule-card">
+            <div class="card-header">
+                <h3><i class="fas fa-list-alt"></i> 时间安排表</h3>
+                <div class="stats-badge">
+                    <span class="badge free-badge" id="freeCount">0</span> 空闲
+                    <span class="badge busy-badge" id="busyCount">0</span> 繁忙
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th class="col-time">时间段</th>
+                            <th class="col-status">状态</th>
+                            <th class="col-admin">设置人</th>
+                            <th class="col-actions">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTable">
+                        <!-- 数据动态加载 -->
+                    </tbody>
+                </table>
+                
+                <div class="empty-state" id="emptyState">
+                    <i class="far fa-calendar-times"></i>
+                    <p>今天没有时间安排</p>
+                    <p class="empty-tip">管理员登录后可添加时间安排</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 说明卡片 -->
+        <div class="card help-card">
+            <h3><i class="fas fa-question-circle"></i> 使用说明</h3>
+            <div class="help-content">
+                <div class="help-item">
+                    <i class="fas fa-eye"></i>
+                    <div>
+                        <h4>普通成员</h4>
+                        <p>直接查看时间安排，无需登录</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <i class="fas fa-user-shield"></i>
+                    <div>
+                        <h4>管理员</h4>
+                        <p>点击右上角登录，可设置时间安排</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <i class="fas fa-keyboard"></i>
+                    <div>
+                        <h4>键盘快捷键</h4>
+                        <p>• Enter：确认操作</p>
+                        <p>• ESC：关闭窗口</p>
+                        <p>• Tab：切换焦点</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div class="modal" id="loginModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> 管理员登录</h3>
+                <button class="close-btn" onclick="hideLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="loginUsername">
+                        <i class="fas fa-user"></i> 管理员账号
+                    </label>
+                    <input type="text" id="loginUsername" placeholder="输入账号" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">
+                        <i class="fas fa-lock"></i> 密码
+                    </label>
+                    <input type="password" id="loginPassword" placeholder="输入密码" autocomplete="current-password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideLoginModal()">取消</button>
+                <button class="btn btn-primary" onclick="performLogin()">
+                    <i class="fas fa-sign-in-alt"></i> 登录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员设置模态框 -->
+    <div class="modal" id="adminSettingsModal">
+        <div class="modal-dialog wide">
+            <div class="modal-header">
+                <h3><i class="fas fa-users-cog"></i> 管理员设置</h3>
+                <button class="close-btn" onclick="hideAdminSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 当前管理员信息 -->
+                <div class="current-admin-info">
+                    <h4>当前账号信息</h4>
+                    <div class="info-row">
+                        <span class="info-label">账号：</span>
+                        <span id="currentAccount" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">昵称：</span>
+                        <input type="text" id="editAdminName" class="info-input">
+                    </div>
+                    <button onclick="updateAdminName()" class="btn btn-success btn-sm">
+                        <i class="fas fa-save"></i> 更新昵称
+                    </button>
+                </div>
+
+                <!-- 修改密码 -->
+                <div class="change-password-form">
+                    <h4>修改密码</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>当前密码：</label>
+                            <input type="password" id="currentPassword" placeholder="输入当前密码">
+                        </div>
+                        <div class="form-group">
+                            <label>新密码：</label>
+                            <input type="password" id="newPassword" placeholder="输入新密码">
+                        </div>
+                        <div class="form-group">
+                            <label>确认新密码：</label>
+                            <input type="password" id="confirmPassword" placeholder="再次输入新密码">
+                        </div>
+                        <button onclick="changePassword()" class="btn btn-warning">
+                            <i class="fas fa-key"></i> 修改密码
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 添加新管理员 -->
+                <div class="add-admin-form">
+                    <h4>添加新管理员</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>账号：</label>
+                            <input type="text" id="newAdminUsername" placeholder="输入账号">
+                        </div>
+                        <div class="form-group">
+                            <label>密码：</label>
+                            <input type="password" id="newAdminPassword" placeholder="输入密码">
+                        </div>
+                        <div class="form-group">
+                            <label>昵称：</label>
+                            <input type="text" id="newAdminName" placeholder="输入昵称">
+                        </div>
+                        <button onclick="addNewAdmin()" class="btn btn-success">
+                            <i class="fas fa-plus"></i> 添加
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 现有管理员列表 -->
+                <div class="admin-list">
+                    <h4>管理员列表</h4>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>账号</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminList">
+                            <!-- 管理员列表动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideAdminSettings()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚注 -->
+    <footer class="footer">
+        <div class="container">
+            <p>时间管理系统 v1.0 &copy; 2024</p>
+        </div>
+    </footer>
+
+    <!-- 脚本引入 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
