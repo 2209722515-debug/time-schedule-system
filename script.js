@@ -969,113 +969,190 @@ function setupInputKeyboard() {
 }
 
 console.log('时间管理系统初始化完成');
-// ============================================
-// 云同步模块
-// ============================================
-
-class CloudSync {
+// GitHub Gist同步方案
+class GitHubGistSync {
     constructor() {
-        this.syncInterval = 30000; // 30秒同步一次
-        this.lastSyncTime = 0;
-        this.isSyncing = false;
+        this.gistId = localStorage.getItem('sync_gist_id');
+        this.githubToken = ''; // 需要用户提供
+        this.gistFilename = 'time_schedule_data.json';
     }
 
-    // 初始化云同步
-    async init() {
-        // 检查是否有云存储服务
-        if (this.hasCloudStorage()) {
-            await this.syncWithCloud();
-            this.startAutoSync();
+    // 设置GitHub Token
+    setToken(token) {
+        this.githubToken = token;
+        localStorage.setItem('github_token', token);
+    }
+
+    // 创建或更新Gist
+    async saveToGist() {
+        if (!this.githubToken) {
+            showMessage('请先设置GitHub Token', 'warning');
+            return false;
         }
+
+        const data = {
+            schedules: schedules,
+            adminUsers: adminUsers,
+            lastUpdated: new Date().toISOString()
+        };
+
+        const gistData = {
+            description: '时间管理系统数据同步',
+            public: false,
+            files: {
+                [this.gistFilename]: {
+                    content: JSON.stringify(data, null, 2)
+                }
+            }
+        };
+
+        try {
+            let url = 'https://api.github.com/gists';
+            let method = 'POST';
+
+            if (this.gistId) {
+                url = `https://api.github.com/gists/${this.gistId}`;
+                method = 'PATCH';
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `token ${this.githubToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gistData)
+            });
+
+            const result = await response.json();
+            
+            if (result.id) {
+                this.gistId = result.id;
+                localStorage.setItem('sync_gist_id', result.id);
+                showMessage('数据已保存到云端', 'success');
+                return true;
+            }
+        } catch (error) {
+            console.error('Gist保存失败:', error);
+            showMessage('同步失败: ' + error.message, 'error');
+        }
+        return false;
     }
 
-    // 检查云存储支持
-    hasCloudStorage() {
-        // 这里可以实现多种云存储：
-        // 1. Firebase Firestore
-        // 2. Supabase
-        // 3. 自定义后端API
-        // 4. GitHub Gist（简单免费）
-        return false; // 暂时返回false，需要您选择方案
+    // 从Gist加载
+    async loadFromGist() {
+        if (!this.gistId || !this.githubToken) {
+            return false;
+        }
+
+        try {
+            const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
+                headers: {
+                    'Authorization': `token ${this.githubToken}`
+                }
+            });
+
+            const gist = await response.json();
+            const fileContent = gist.files[this.gistFilename].content;
+            const data = JSON.parse(fileContent);
+
+            // 合并数据
+            this.mergeData(data);
+            
+            showMessage('已从云端加载数据', 'success');
+            return true;
+        } catch (error) {
+            console.error('Gist加载失败:', error);
+            showMessage('加载失败: ' + error.message, 'error');
+        }
+        return false;
     }
 
-    // 同步到云端
-    async syncToCloud() {
-        if (this.isSyncing) return;
+    // 合并数据（智能合并冲突）
+    mergeData(cloudData) {
+        // 这里实现数据合并逻辑
+        // 可以按时间戳合并，或者让用户选择
         
-        this.isSyncing = true;
-        try {
-            const syncData = {
-                schedules: schedules,
-                adminUsers: adminUsers,
-                syncTime: new Date().getTime(),
-                deviceId: await this.getDeviceId()
-            };
-
-            // 这里添加实际的云存储代码
-            // 例如使用Firebase、Supabase或自定义API
-            
-            this.lastSyncTime = Date.now();
-            showMessage('数据已同步到云端', 'success');
-        } catch (error) {
-            console.error('云同步失败:', error);
-            showMessage('云同步失败', 'error');
-        } finally {
-            this.isSyncing = false;
+        if (cloudData.schedules) {
+            schedules = cloudData.schedules;
+            saveSchedules();
         }
-    }
-
-    // 从云端获取
-    async syncFromCloud() {
-        try {
-            // 从云端获取最新数据
-            // const cloudData = await fetchFromCloud();
-            
-            // 合并数据逻辑
-            // this.mergeData(cloudData);
-            
-            showMessage('已从云端同步最新数据', 'success');
-            loadSchedules();
-        } catch (error) {
-            console.error('获取云端数据失败:', error);
+        
+        if (cloudData.adminUsers) {
+            adminUsers = cloudData.adminUsers;
+            saveAdminUsers();
         }
-    }
-
-    // 获取设备ID
-    async getDeviceId() {
-        let deviceId = localStorage.getItem('device_id');
-        if (!deviceId) {
-            deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('device_id', deviceId);
-        }
-        return deviceId;
-    }
-
-    // 启动自动同步
-    startAutoSync() {
-        setInterval(() => {
-            this.syncToCloud();
-        }, this.syncInterval);
-    }
-
-    // 手动同步按钮
-    manualSync() {
-        this.syncToCloud();
-        setTimeout(() => {
-            this.syncFromCloud();
-        }, 1000);
+        
+        loadSchedules();
     }
 }
 
-// 在初始化时启用云同步
-let cloudSync = null;
-
-function initCloudSync() {
-    cloudSync = new CloudSync();
-    cloudSync.init();
+// 在HTML中添加同步设置界面
+function addSyncSettings() {
+    // 在管理员设置模态框中添加
+    const adminSettings = document.querySelector('.admin-list');
+    if (adminSettings) {
+        adminSettings.insertAdjacentHTML('afterend', `
+            <div class="cloud-sync-settings">
+                <h4><i class="fas fa-cloud"></i> 云同步设置</h4>
+                <div class="form-group">
+                    <label>GitHub Token：</label>
+                    <input type="password" id="githubToken" placeholder="输入GitHub Personal Access Token" class="form-control">
+                    <small class="form-text">
+                        <a href="https://github.com/settings/tokens" target="_blank">获取Token</a>
+                        （需要gist权限）
+                    </small>
+                </div>
+                <div class="form-group">
+                    <button onclick="setupGitHubSync()" class="btn btn-primary">
+                        <i class="fas fa-key"></i> 设置Token
+                    </button>
+                    <button onclick="syncToCloud()" class="btn btn-success">
+                        <i class="fas fa-cloud-upload-alt"></i> 上传到云端
+                    </button>
+                    <button onclick="syncFromCloud()" class="btn btn-info">
+                        <i class="fas fa-cloud-download-alt"></i> 从云端下载
+                    </button>
+                </div>
+                <div class="sync-status" id="syncStatus">
+                    <!-- 同步状态显示 -->
+                </div>
+            </div>
+        `);
+    }
 }
 
-// 在页面加载后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initCloudSync, 2000);
-});
+// 全局同步实例
+let gistSync = null;
+
+function setupGitHubSync() {
+    const token = document.getElementById('githubToken').value.trim();
+    if (!token) {
+        showMessage('请输入GitHub Token', 'warning');
+        return;
+    }
+    
+    if (!gistSync) {
+        gistSync = new GitHubGistSync();
+    }
+    
+    gistSync.setToken(token);
+    showMessage('GitHub Token已设置', 'success');
+}
+
+async function syncToCloud() {
+    if (!gistSync) {
+        gistSync = new GitHubGistSync();
+    }
+    
+    await gistSync.saveToGist();
+}
+
+async function syncFromCloud() {
+    if (!gistSync) {
+        showMessage('请先设置GitHub Token', 'warning');
+        return;
+    }
+    
+    await gistSync.loadFromGist();
+}
