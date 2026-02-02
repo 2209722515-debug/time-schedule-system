@@ -23,12 +23,14 @@ body {
     background: #f5f7fa;
     color: var(--dark-color);
     line-height: 1.6;
+    -webkit-text-size-adjust: 100%; /* 防止手机端字体缩放 */
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
 }
 
 /* 导航栏 */
@@ -63,6 +65,24 @@ body {
 .nav-user .btn {
     padding: 8px 20px;
     font-size: 14px;
+}
+
+.sync-badge {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: normal;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
 }
 
 /* 卡片样式 */
@@ -114,6 +134,7 @@ body {
 .quick-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .current-date {
@@ -139,6 +160,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    min-height: 44px; /* 手机触摸友好 */
 }
 
 .btn:hover {
@@ -214,6 +236,13 @@ body {
 .btn-sm {
     padding: 6px 12px;
     font-size: 12px;
+    min-height: 36px;
+}
+
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 11px;
+    min-height: 28px;
 }
 
 /* 管理员卡片 */
@@ -226,6 +255,8 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .time-setter {
@@ -252,6 +283,7 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
+    min-height: 44px; /* 手机触摸友好 */
 }
 
 .status-btn:hover {
@@ -297,19 +329,46 @@ body {
 
 .time-input,
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="date"] {
     width: 100%;
-    padding: 10px;
+    padding: 12px; /* 增加内边距便于触摸 */
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    font-size: 16px;
+    font-size: 16px; /* 防止手机自动缩放 */
+    min-height: 44px; /* 手机触摸友好 */
 }
 
 .time-input:focus,
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="date"]:focus {
     outline: 2px solid var(--primary-color);
     border-color: var(--primary-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 14px;
+}
+
+.form-text {
+    font-size: 12px;
+    color: var(--gray-color);
+    margin-top: 5px;
+    display: block;
+}
+
+.form-text a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.form-text a:hover {
+    text-decoration: underline;
 }
 
 /* 时间表 */
@@ -318,6 +377,8 @@ input[type="password"]:focus {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .stats-badge {
@@ -343,13 +404,43 @@ input[type="password"]:focus {
     color: var(--danger-color);
 }
 
+.sync-badge {
+    background: rgba(52, 152, 219, 0.2);
+    color: var(--primary-color);
+}
+
 .table-responsive {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* 手机平滑滚动 */
+    position: relative;
+}
+
+.scroll-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(52, 152, 219, 0.9);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    z-index: 10;
+    animation: pulse 2s infinite;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
 }
 
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px; /* 确保表格最小宽度 */
 }
 
 .schedule-table th {
@@ -359,6 +450,7 @@ input[type="password"]:focus {
     font-weight: 600;
     color: var(--dark-color);
     border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
 }
 
 .schedule-table td {
@@ -372,18 +464,22 @@ input[type="password"]:focus {
 
 .col-time {
     width: 25%;
+    min-width: 150px;
 }
 
 .col-status {
     width: 15%;
+    min-width: 80px;
 }
 
 .col-admin {
     width: 25%;
+    min-width: 120px;
 }
 
 .col-actions {
     width: 35%;
+    min-width: 100px;
 }
 
 .status-cell {
@@ -393,6 +489,7 @@ input[type="password"]:focus {
     font-weight: 500;
     text-align: center;
     width: fit-content;
+    display: inline-block;
 }
 
 .status-free {
@@ -421,12 +518,16 @@ input[type="password"]:focus {
 .action-buttons {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .empty-state {
     text-align: center;
     padding: 50px 20px;
     color: var(--gray-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .empty-state i {
@@ -453,6 +554,265 @@ input[type="password"]:focus {
     gap: 10px;
 }
 
+/* 同步设置样式 */
+.sync-status-section,
+.sync-control-section,
+.sync-info-section,
+.cloud-sync-section,
+.sync-help-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sync-status-section:last-child,
+.sync-control-section:last-child,
+.sync-info-section:last-child,
+.cloud-sync-section:last-child,
+.sync-help-section:last-child {
+    border-bottom: none;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+}
+
+.status-label {
+    font-size: 12px;
+    color: var(--gray-color);
+    margin-bottom: 5px;
+}
+
+.status-value {
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-value.online {
+    color: var(--secondary-color);
+}
+
+.status-value.offline {
+    color: var(--danger-color);
+}
+
+.status-value.active {
+    color: var(--primary-color);
+}
+
+.status-value.inactive {
+    color: var(--gray-color);
+}
+
+/* 开关样式 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+}
+
+.toggle-label {
+    font-weight: 500;
+}
+
+.sync-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.sync-info {
+    margin-top: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.info-label {
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.info-value {
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.sync-key {
+    flex: 1;
+    padding: 8px 12px;
+    background: #f1f3f4;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.cloud-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+/* 帮助步骤 */
+.help-content {
+    margin-top: 15px;
+}
+
+.help-step {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--primary-color);
+}
+
+.step-number {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    margin-right: 10px;
+    font-size: 12px;
+}
+
+.help-step h5 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.help-step p {
+    margin-left: 34px;
+    color: var(--gray-color);
+    font-size: 14px;
+}
+
+/* 冲突解决样式 */
+.conflict-options {
+    margin: 20px 0;
+}
+
+.conflict-option {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+}
+
+.conflict-option:hover {
+    border-color: var(--primary-color);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.conflict-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.conflict-option label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.conflict-option label strong {
+    margin-bottom: 5px;
+}
+
+.conflict-option label small {
+    color: var(--gray-color);
+    font-size: 12px;
+}
+
+.conflict-preview {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
 /* 管理员设置模态框内容 */
 .current-admin-info,
 .change-password-form,
@@ -475,16 +835,7 @@ input[type="password"]:focus {
     align-items: center;
     margin-bottom: 15px;
     gap: 10px;
-}
-
-.info-label {
-    font-weight: 500;
-    min-width: 80px;
-}
-
-.info-value {
-    color: var(--dark-color);
-    font-weight: 500;
+    flex-wrap: wrap;
 }
 
 .info-input {
@@ -493,6 +844,7 @@ input[type="password"]:focus {
     border-radius: var(--radius);
     font-size: 14px;
     min-width: 200px;
+    min-height: 36px;
 }
 
 .info-input:focus {
@@ -530,6 +882,7 @@ input[type="password"]:focus {
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    padding: 20px;
 }
 
 .modal-dialog {
@@ -553,6 +906,9 @@ input[type="password"]:focus {
     justify-content: space-between;
     align-items: center;
     border-radius: var(--radius) var(--radius) 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .modal-header h3 {
@@ -566,8 +922,8 @@ input[type="password"]:focus {
     color: white;
     font-size: 24px;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
+    width: 44px; /* 手机触摸友好 */
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -580,6 +936,7 @@ input[type="password"]:focus {
 
 .modal-body {
     padding: 30px;
+    overflow-y: auto;
 }
 
 .modal-footer {
@@ -597,6 +954,7 @@ input[type="password"]:focus {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
 }
 
 /* 说明卡片 */
@@ -638,6 +996,51 @@ input[type="password"]:focus {
     text-align: center;
 }
 
+/* 同步指示器 */
+.sync-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 20px;
+}
+
+.sync-indicator:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.sync-indicator.syncing i {
+    animation: spin 1s linear infinite;
+}
+
+.sync-indicator.online {
+    color: var(--secondary-color);
+}
+
+.sync-indicator.offline {
+    color: var(--danger-color);
+}
+
+.sync-indicator.inactive {
+    color: var(--gray-color);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* 自定义确认对话框 */
 .custom-confirm-modal {
     position: fixed;
@@ -650,6 +1053,7 @@ input[type="password"]:focus {
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    padding: 20px;
 }
 
 .custom-confirm-dialog {
@@ -677,47 +1081,747 @@ input[type="password"]:focus {
 
 .custom-confirm-buttons .btn {
     min-width: 80px;
+    min-height: 44px;
 }
 
-/* 响应式设计 */
+/* ======================
+   增强的响应式设计
+   ====================== */
+
+/* 平板设备 (768px以下) */
 @media (max-width: 768px) {
     .container {
         padding: 0 15px;
     }
     
-    .form-row {
-        flex-direction: column;
+    .main-container {
+        padding-top: 10px;
     }
     
-    .form-group {
-        min-width: 100%;
+    .navbar .container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
     }
     
+    .nav-brand {
+        font-size: 1.3em;
+    }
+    
+    .nav-brand span {
+        font-size: 16px;
+    }
+    
+    .sync-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .header-actions {
+        gap: 5px;
+    }
+    
+    .header-actions .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .nav-user {
+        gap: 10px;
+    }
+    
+    .nav-user .btn {
+        padding: 8px 15px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+    
+    /* 卡片间距调整 */
+    .card {
+        margin-bottom: 15px;
+        padding: 20px 15px;
+    }
+    
+    .card h3 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+    
+    /* 日期选择器优化 */
     .date-input-group {
         flex-direction: column;
-        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .date-input {
+        min-width: 100%;
+        font-size: 16px;
     }
     
     .quick-actions {
-        justify-content: center;
+        width: 100%;
+        justify-content: space-between;
     }
     
-    .modal-dialog {
-        width: 95%;
-        margin: 10px;
+    .quick-actions .btn {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 5px;
+        font-size: 13px;
     }
     
-    .action-buttons {
+    /* 当前日期显示 */
+    .current-date {
+        font-size: 1em;
+        display: flex;
         flex-direction: column;
+        gap: 5px;
+    }
+    
+    #weekDayDisplay {
+        margin-left: 0;
+        font-size: 0.9em;
+    }
+    
+    /* 表格响应式设计 */
+    .table-responsive {
+        margin: 0 -15px;
+        padding: 0 15px;
+        width: calc(100% + 30px);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        background: white;
+    }
+    
+    .schedule-table {
+        min-width: 600px;
     }
     
     .schedule-table th,
     .schedule-table td {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+    
+    .col-time { 
+        width: 30%;
+        min-width: 180px;
+    }
+    .col-status { 
+        width: 20%;
+        min-width: 100px;
+    }
+    .col-admin { 
+        width: 25%;
+        min-width: 140px;
+    }
+    .col-actions { 
+        width: 25%;
+        min-width: 120px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    .status-cell {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    
+    .scroll-hint {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    /* 空状态优化 */
+    .empty-state i {
+        font-size: 36px;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+    
+    .empty-tip {
+        font-size: 12px;
+    }
+    
+    /* 管理员设置面板 */
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-group {
+        min-width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .time-input,
+    input[type="text"],
+    input[type="password"],
+    input[type="date"] {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    /* 状态按钮调整 */
+    .status-buttons {
+        flex-direction: row;
+    }
+    
+    .status-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    /* 统计徽章 */
+    .stats-badge {
+        font-size: 14px;
+        gap: 10px;
+    }
+    
+    .badge {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    
+    /* 同步设置 */
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sync-actions {
+        flex-direction: column;
+    }
+    
+    .sync-actions .btn {
+        width: 100%;
+    }
+    
+    .toggle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .toggle-item .switch {
+        align-self: flex-start;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .cloud-actions {
+        flex-direction: column;
+    }
+    
+    .cloud-actions .btn {
+        width: 100%;
+    }
+    
+    /* 模态框优化 */
+    .modal {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 40px;
+    }
+    
+    .modal-dialog {
+        width: 95%;
+        max-width: 95%;
+        margin: 0 auto;
+        max-height: 85vh;
+    }
+    
+    .modal-dialog.wide {
+        max-width: 95%;
+    }
+    
+    .modal-body {
+        padding: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+    
+    /* 管理员设置表格 */
+    .admin-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        min-width: 500px;
+    }
+    
+    /* 帮助卡片 */
+    .help-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .help-item i {
+        align-self: flex-start;
+        font-size: 20px;
+    }
+    
+    .help-item h4 {
+        font-size: 15px;
+    }
+    
+    .help-item p {
+        font-size: 13px;
+    }
+    
+    /* 帮助步骤 */
+    .help-step {
+        padding: 12px;
+    }
+    
+    .step-number {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 11px;
+    }
+    
+    .help-step h5 {
+        font-size: 14px;
+    }
+    
+    .help-step p {
+        font-size: 12px;
+        margin-left: 30px;
+    }
+    
+    /* 提示框 */
+    .alert {
+        padding: 12px 20px;
+        font-size: 14px;
+        flex-wrap: wrap;
+    }
+    
+    /* 脚注 */
+    .footer {
+        padding: 20px 0;
+        margin-top: 30px;
+        font-size: 14px;
+    }
+    
+    /* 同步指示器 */
+    .sync-indicator {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    /* 快捷操作面板 */
+    .quick-actions-panel {
+        flex-direction: column;
+    }
+    
+    .quick-actions-panel .btn {
+        width: 100%;
+    }
+}
+
+/* 手机设备 (576px以下) */
+@media (max-width: 576px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 0 10px;
+    }
+    
+    .nav-brand {
+        font-size: 1.1em;
+    }
+    
+    .nav-brand span {
+        font-size: 14px;
+    }
+    
+    .sync-badge {
+        display: none; /* 在小屏幕上隐藏徽章 */
+    }
+    
+    .nav-user {
+        width: auto;
+    }
+    
+    .nav-user .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-height: 36px;
+    }
+    
+    /* 卡片 */
+    .card {
+        padding: 15px;
+    }
+    
+    .card h3 {
+        font-size: 1.1em;
+    }
+    
+    .card-header h3 {
+        width: 100%;
+    }
+    
+    /* 日期控件 */
+    .quick-actions .btn {
+        font-size: 12px;
+        padding: 8px 5px;
+    }
+    
+    .quick-actions .btn i {
+        font-size: 12px;
+    }
+    
+    /* 表格 */
+    .schedule-table {
+        min-width: 550px;
+    }
+    
+    .schedule-table th,
+    .schedule-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    /* 按钮调整 */
+    .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+    
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-height: 32px;
+    }
+    
+    /* 表单输入 */
+    .time-input,
+    input[type="text"],
+    input[type="password"],
+    input[type="date"] {
+        padding: 10px;
+        font-size: 16px; /* 防止iOS缩放 */
+        min-height: 44px;
+    }
+    
+    /* 模态框 */
+    .modal {
+        padding-top: 20px;
+    }
+    
+    .modal-dialog {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 10px;
+    }
+    
+    /* 当前日期显示 */
+    .current-date {
+        font-size: 0.95em;
+    }
+}
+
+/* 超小屏幕手机 (414px以下) */
+@media (max-width: 414px) {
+    .navbar {
+        padding: 10px 0;
+    }
+    
+    .nav-brand span {
+        font-size: 13px;
+    }
+    
+    .nav-user .btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    .alert {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .date-input {
         padding: 10px;
         font-size: 14px;
     }
     
-    .status-buttons {
-        flex-direction: column;
+    .current-date {
+        font-size: 0.9em;
+    }
+    
+    /* 表格进一步优化 */
+    .schedule-table {
+        min-width: 500px;
+    }
+    
+    .schedule-table th,
+    .schedule-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .col-time { min-width: 150px; }
+    .col-status { min-width: 80px; }
+    .col-admin { min-width: 120px; }
+    .col-actions { min-width: 100px; }
+    
+    .status-cell {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    /* 统计徽章 */
+    .stats-badge {
+        font-size: 12px;
+        gap: 8px;
+    }
+    
+    .badge {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+    
+    /* 帮助卡片 */
+    .help-item h4 {
+        font-size: 14px;
+    }
+    
+    .help-item p {
+        font-size: 12px;
+    }
+}
+
+/* 横向模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .main-container {
+        padding-top: 5px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .table-responsive {
+        max-height: 200px;
+    }
+    
+    .modal {
+        align-items: center;
+        padding: 10px;
+    }
+    
+    .modal-dialog {
+        max-height: 80vh;
+    }
+    
+    .modal-body {
+        max-height: 50vh;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover,
+    .status-btn:hover,
+    .close-btn:hover {
+        transform: none;
+    }
+    
+    .btn:active,
+    .status-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+    
+    /* 增加触摸目标大小 */
+    .action-buttons .btn,
+    .admin-table .btn {
+        min-height: 36px;
+    }
+    
+    .schedule-table td {
+        padding: 12px 10px;
+    }
+    
+    .sync-indicator {
+        min-height: 44px;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dark-color: #f8f9fa;
+        --light-color: #343a40;
+        --border-color: #495057;
+        --shadow: 0 2px 12px rgba(0,0,0,0.3);
+        --gray-color: #adb5bd;
+    }
+    
+    body {
+        background: #212529;
+        color: #f8f9fa;
+    }
+    
+    .card {
+        background: #343a40;
+        color: #f8f9fa;
+    }
+    
+    .date-card {
+        background: linear-gradient(135deg, #3a4dcc 0%, #5d3a8c 100%);
+    }
+    
+    .time-setter {
+        background: #495057;
+    }
+    
+    .schedule-table tr:hover {
+        background: #495057;
+    }
+    
+    .modal-dialog {
+        background: #343a40;
+        color: #f8f9fa;
+    }
+    
+    .time-input,
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    .info-input,
+    .form-control {
+        background: #495057;
+        border-color: #6c757d;
+        color: #f8f9fa;
+    }
+    
+    .time-input:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="date"]:focus,
+    .info-input:focus,
+    .form-control:focus {
+        border-color: #3498db;
+    }
+    
+    .form-group label,
+    .info-label,
+    .status-label,
+    .toggle-label {
+        color: #dee2e6;
+    }
+    
+    .status-item,
+    .toggle-item,
+    .help-step,
+    .conflict-preview {
+        background: #2d3748;
+    }
+    
+    .sync-key {
+        background: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .sync-indicator {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .badge.free-badge {
+        background: rgba(46, 204, 113, 0.3);
+    }
+    
+    .badge.busy-badge {
+        background: rgba(231, 76, 60, 0.3);
+    }
+    
+    .badge.sync-badge {
+        background: rgba(52, 152, 219, 0.3);
+    }
+}
+
+/* 滚动条样式优化 */
+@media (max-width: 768px) {
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .navbar,
+    .admin-card,
+    .help-card,
+    .footer,
+    .modal,
+    .action-buttons,
+    .quick-actions-panel,
+    .sync-indicator,
+    .network-status {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .table-responsive {
+        overflow: visible;
+    }
+    
+    .schedule-table {
+        min-width: 100%;
     }
 }
