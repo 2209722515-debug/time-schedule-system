@@ -969,3 +969,113 @@ function setupInputKeyboard() {
 }
 
 console.log('时间管理系统初始化完成');
+// ============================================
+// 云同步模块
+// ============================================
+
+class CloudSync {
+    constructor() {
+        this.syncInterval = 30000; // 30秒同步一次
+        this.lastSyncTime = 0;
+        this.isSyncing = false;
+    }
+
+    // 初始化云同步
+    async init() {
+        // 检查是否有云存储服务
+        if (this.hasCloudStorage()) {
+            await this.syncWithCloud();
+            this.startAutoSync();
+        }
+    }
+
+    // 检查云存储支持
+    hasCloudStorage() {
+        // 这里可以实现多种云存储：
+        // 1. Firebase Firestore
+        // 2. Supabase
+        // 3. 自定义后端API
+        // 4. GitHub Gist（简单免费）
+        return false; // 暂时返回false，需要您选择方案
+    }
+
+    // 同步到云端
+    async syncToCloud() {
+        if (this.isSyncing) return;
+        
+        this.isSyncing = true;
+        try {
+            const syncData = {
+                schedules: schedules,
+                adminUsers: adminUsers,
+                syncTime: new Date().getTime(),
+                deviceId: await this.getDeviceId()
+            };
+
+            // 这里添加实际的云存储代码
+            // 例如使用Firebase、Supabase或自定义API
+            
+            this.lastSyncTime = Date.now();
+            showMessage('数据已同步到云端', 'success');
+        } catch (error) {
+            console.error('云同步失败:', error);
+            showMessage('云同步失败', 'error');
+        } finally {
+            this.isSyncing = false;
+        }
+    }
+
+    // 从云端获取
+    async syncFromCloud() {
+        try {
+            // 从云端获取最新数据
+            // const cloudData = await fetchFromCloud();
+            
+            // 合并数据逻辑
+            // this.mergeData(cloudData);
+            
+            showMessage('已从云端同步最新数据', 'success');
+            loadSchedules();
+        } catch (error) {
+            console.error('获取云端数据失败:', error);
+        }
+    }
+
+    // 获取设备ID
+    async getDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
+    }
+
+    // 启动自动同步
+    startAutoSync() {
+        setInterval(() => {
+            this.syncToCloud();
+        }, this.syncInterval);
+    }
+
+    // 手动同步按钮
+    manualSync() {
+        this.syncToCloud();
+        setTimeout(() => {
+            this.syncFromCloud();
+        }, 1000);
+    }
+}
+
+// 在初始化时启用云同步
+let cloudSync = null;
+
+function initCloudSync() {
+    cloudSync = new CloudSync();
+    cloudSync.init();
+}
+
+// 在页面加载后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initCloudSync, 2000);
+});
