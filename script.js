@@ -6,10 +6,10 @@
 const CONFIG = {
     // GitHub Pages配置
     github: {
-        username: '2209722515-debug',  // 你的GitHub用户名
-        repo: 'time-schedule-data',    // 数据仓库名
-        branch: 'main',                // 分支名
-        dataFile: 'data.json',         // 数据文件名
+        username: '2209722515-debug',
+        repo: 'time-schedule-data',
+        branch: 'main',
+        dataFile: 'data.json',
         apiUrl: 'https://api.github.com/repos/2209722515-debug/time-schedule-data/contents/data.json',
         rawUrl: 'https://raw.githubusercontent.com/2209722515-debug/time-schedule-data/main/data.json',
         pagesUrl: 'https://2209722515-debug.github.io/time-schedule-data/data.json'
@@ -22,7 +22,7 @@ const CONFIG = {
         loginInfo: 'admin_login_info_v7',
         lastSyncTime: 'last_sync_time_v2',
         lastGitHash: 'last_git_hash_v2',
-        githubToken: 'github_token_shared_v1',  // 共享Token
+        githubToken: 'github_token_shared_v1',
         autoUpload: 'auto_upload_enabled_v1'
     },
     
@@ -39,12 +39,12 @@ const CONFIG = {
     
     // 同步配置
     sync: {
-        enabled: true,                 // 默认启用同步
-        interval: 30000,               // 30秒同步一次
-        retryInterval: 5000,           // 重试间隔
-        maxRetries: 3,                 // 最大重试次数
-        autoResolve: true,             // 自动解决冲突
-        autoUpload: true               // 自动上传修改
+        enabled: true,
+        interval: 30000,
+        retryInterval: 5000,
+        maxRetries: 3,
+        autoResolve: true,
+        autoUpload: true
     }
 };
 
@@ -60,7 +60,7 @@ let autoUploadEnabled = CONFIG.sync.autoUpload;
 let syncInterval = null;
 let lastSyncTime = 0;
 let lastGitHash = '';
-let githubToken = '';  // 共享GitHub Token
+let githubToken = '';
 let isSyncing = false;
 let syncTimeout = null;
 
@@ -70,7 +70,6 @@ let syncTimeout = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('时间管理系统初始化开始...');
-    console.log('GitHub配置:', CONFIG.github);
     
     initToastr();
     initData();
@@ -80,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initSync();
     checkForScrollHint();
     
-    // 页面加载完成后自动同步一次
     setTimeout(() => {
         if (syncEnabled && isOnline) {
             checkAndSync();
@@ -89,29 +87,100 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initToastr() {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": true,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "3000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
+    // 添加toastr安全性检查
+    if (typeof toastr === 'undefined') {
+        console.warn('toastr未加载，将使用备用提示系统');
+        // 创建备用toastr
+        window.toastr = {
+            options: {},
+            success: function(msg) { 
+                console.log('✅', msg);
+                showFallbackMessage(msg, 'success');
+            },
+            error: function(msg) { 
+                console.log('❌', msg);
+                showFallbackMessage(msg, 'error');
+            },
+            warning: function(msg) { 
+                console.log('⚠️', msg);
+                showFallbackMessage(msg, 'warning');
+            },
+            info: function(msg) { 
+                console.log('ℹ️', msg);
+                showFallbackMessage(msg, 'info');
+            }
+        };
+    } else {
+        // 配置toastr
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    }
+}
+
+// 备用消息显示函数
+function showFallbackMessage(message, type = 'info') {
+    const colors = {
+        success: '#2ecc71',
+        error: '#e74c3c',
+        warning: '#f39c12',
+        info: '#3498db'
     };
+    
+    const icon = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = `${icon[type] || 'ℹ️'} ${message}`;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${colors[type] || '#3498db'};
+        color: white;
+        border-radius: 4px;
+        z-index: 9999;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
+    
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transition = 'opacity 0.5s';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 500);
+    }, 3000);
 }
 
 function initData() {
     console.log('初始化数据...');
     
-    // 加载时间安排
     try {
         const savedSchedules = localStorage.getItem(CONFIG.storageKeys.schedules);
         schedules = savedSchedules ? JSON.parse(savedSchedules) : [];
@@ -121,14 +190,12 @@ function initData() {
         console.error('加载时间安排失败：', error);
     }
     
-    // 加载管理员配置
     try {
         const savedAdmins = localStorage.getItem(CONFIG.storageKeys.adminUsers);
         if (savedAdmins) {
             adminUsers = JSON.parse(savedAdmins);
             console.log(`从本地存储加载了 ${adminUsers.length} 个管理员`);
         } else {
-            // 第一次使用，创建默认管理员
             adminUsers = [CONFIG.defaultAdmin];
             saveAdminUsers();
             console.log('创建默认管理员：admin / admin123');
@@ -138,7 +205,6 @@ function initData() {
         console.error('加载管理员配置失败：', error);
     }
     
-    // 加载同步设置
     try {
         const savedLastSync = localStorage.getItem(CONFIG.storageKeys.lastSyncTime);
         lastSyncTime = savedLastSync ? parseInt(savedLastSync) : 0;
@@ -146,20 +212,19 @@ function initData() {
         const savedGitHash = localStorage.getItem(CONFIG.storageKeys.lastGitHash);
         lastGitHash = savedGitHash || '';
         
-        // 加载共享GitHub Token
+        // 加载共享GitHub Token - 修复：确保从localStorage正确加载
         const savedToken = localStorage.getItem(CONFIG.storageKeys.githubToken);
         githubToken = savedToken || '';
+        console.log('加载的Token:', githubToken ? '已配置' : '未配置');
         
-        // 加载自动上传设置
         const savedAutoUpload = localStorage.getItem(CONFIG.storageKeys.autoUpload);
         autoUploadEnabled = savedAutoUpload !== null ? JSON.parse(savedAutoUpload) : CONFIG.sync.autoUpload;
         
-        console.log('同步设置加载完成，Token状态:', githubToken ? '已配置' : '未配置');
+        console.log('同步设置加载完成');
     } catch (error) {
         console.error('加载同步设置失败：', error);
     }
     
-    // 检查登录状态
     checkLoginStatus();
 }
 
@@ -171,6 +236,11 @@ function initUI() {
     loadSchedules();
     updateSyncUI();
     updateTokenStatusUI();
+    
+    // 修复：确保按钮事件正确绑定
+    setTimeout(() => {
+        rebindButtonEvents();
+    }, 500);
 }
 
 function initDatePicker() {
@@ -219,7 +289,7 @@ function updateDateDisplay() {
 }
 
 // ============================================
-// GitHub Token管理（所有管理员均可配置）
+// GitHub Token管理（已修复所有问题）
 // ============================================
 
 // 配置GitHub Token（点击按钮触发）
@@ -234,13 +304,11 @@ function configureGitHubToken() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // 清空输入框
         const tokenInput = document.getElementById('githubTokenInput');
         if (tokenInput) {
             tokenInput.value = '';
         }
         
-        // 聚焦到输入框
         setTimeout(() => {
             if (tokenInput) tokenInput.focus();
         }, 100);
@@ -256,21 +324,29 @@ function hideGitHubTokenModal() {
     }
 }
 
-// 测试输入的GitHub Token
+// 测试输入的GitHub Token（已修复toastr问题）
 async function testGitHubTokenInput() {
     const tokenInput = document.getElementById('githubTokenInput');
-    if (!tokenInput) return;
+    if (!tokenInput) {
+        console.error('找不到Token输入框');
+        showMessage('找不到Token输入框', 'error');
+        return;
+    }
     
     const token = tokenInput.value.trim();
+    console.log('要测试的Token:', token ? '有内容' : '空');
     
     if (!token) {
         showMessage('请输入GitHub Token', 'warning');
+        tokenInput.focus();
         return;
     }
     
     // 验证Token格式
     if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
         showMessage('Token格式不正确，请确保是有效的GitHub Token', 'warning');
+        tokenInput.focus();
+        tokenInput.select();
         return;
     }
     
@@ -278,114 +354,20 @@ async function testGitHubTokenInput() {
     
     const isValid = await testGitHubTokenWithToken(token);
     if (isValid) {
-        showMessage('Token验证成功！可以正常访问GitHub仓库', 'success');
+        showMessage('✅ Token验证成功！可以正常访问GitHub仓库', 'success');
         tokenInput.style.borderColor = '#2ecc71';
+        tokenInput.style.borderWidth = '2px';
+        
+        setTimeout(() => {
+            tokenInput.style.borderColor = '';
+            tokenInput.style.borderWidth = '';
+        }, 3000);
     }
 }
 
 // 使用指定Token测试GitHub API
 async function testGitHubTokenWithToken(token) {
     try {
-        const response = await fetch(CONFIG.github.apiUrl, {
-            headers: {
-                'Authorization': `token ${token}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
-        
-        if (response.ok) {
-            console.log('GitHub Token验证成功');
-            return true;
-        } else {
-            const error = await response.json();
-            console.error('GitHub Token验证失败:', error);
-            
-            let errorMessage = 'Token验证失败: ';
-            if (response.status === 401) {
-                errorMessage += 'Token无效或已过期';
-            } else if (response.status === 403) {
-                errorMessage += '权限不足（需要repo权限）';
-            } else if (response.status === 404) {
-                errorMessage += '仓库不存在或无法访问';
-            } else {
-                errorMessage += error.message || '未知错误';
-            }
-            
-            showMessage(errorMessage, 'error');
-            return false;
-        }
-    } catch (error) {
-        console.error('测试GitHub Token时出错:', error);
-        showMessage('Token测试失败: ' + error.message, 'error');
-        return false;
-    }
-}
-
-// 保存GitHub Token
-async function saveGitHubToken() {
-    const tokenInput = document.getElementById('githubTokenInput');
-    if (!tokenInput) return;
-    
-    const token = tokenInput.value.trim();
-    
-    if (!token) {
-        showMessage('请输入GitHub Token', 'warning');
-        return;
-    }
-    
-    // 验证Token格式
-    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-        showMessage('Token格式不正确，请确保是有效的GitHub Token', 'warning');
-        return;
-    }
-    
-    // 先测试Token是否有效
-    showMessage('正在验证Token有效性...', 'info');
-    
-    const isValid = await testGitHubTokenWithToken(token);
-    if (!isValid) {
-        return;
-    }
-    
-    // 保存Token到本地存储（所有管理员共享）
-    githubToken = token;
-    localStorage.setItem(CONFIG.storageKeys.githubToken, token);
-    
-    hideGitHubTokenModal();
-    
-    // 更新UI状态
-    updateTokenStatusUI();
-    updateSyncUI();
-    
-    showMessage('GitHub Token配置成功！所有管理员现在都可以上传数据到云端', 'success');
-    
-    // 立即尝试上传一次数据
-    setTimeout(() => {
-        uploadToGitHub();
-    }, 500);
-}
-
-// 测试当前保存的GitHub Token
-async function testGitHubToken() {
-    if (!githubToken) {
-        showMessage('未配置GitHub Token', 'warning');
-        return;
-    }
-    
-    showMessage('正在测试当前Token...', 'info');
-    
-    const isValid = await testGitHubTokenWithToken(githubToken);
-    if (isValid) {
-        showMessage('当前Token验证成功！可以正常上传数据', 'success');
-    }
-}
-
-// 使用指定Token测试GitHub API
-async function testGitHubTokenWithToken(token) {
-    try {
-        // 先显示测试中的消息
-        showMessage('正在连接GitHub API...', 'info');
-        
         const response = await fetch(CONFIG.github.apiUrl, {
             headers: {
                 'Authorization': `token ${token}`,
@@ -421,45 +403,112 @@ async function testGitHubTokenWithToken(token) {
     }
 }
 
-// 测试输入的GitHub Token（在Token配置模态框中）
-async function testGitHubTokenInput() {
+// 保存GitHub Token（已修复重复点击和空值问题）
+let isSavingToken = false; // 防重复点击标志
+
+async function saveGitHubToken() {
+    console.log('点击了保存Token按钮');
+    
+    // ============ 修复：防重复点击 ============
+    if (isSavingToken) {
+        console.log('Token保存操作正在进行中，请稍候...');
+        return;
+    }
+    isSavingToken = true;
+    // ==========================================
+    
     const tokenInput = document.getElementById('githubTokenInput');
     if (!tokenInput) {
-        showMessage('找不到Token输入框', 'error');
+        console.error('找不到Token输入框');
+        isSavingToken = false; // 修复：重置状态
         return;
     }
     
     const token = tokenInput.value.trim();
+    console.log('尝试保存的Token:', token ? '有内容' : '空');
     
+    // ============ 修复：空值检查 ============
     if (!token) {
-        showMessage('请输入GitHub Token', 'warning');
-        tokenInput.focus();
+        showMessage('Token不能为空', 'warning');
+        isSavingToken = false; // 修复：重置状态
         return;
     }
+    // ==========================================
     
     // 验证Token格式
     if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
         showMessage('Token格式不正确，请确保是有效的GitHub Token', 'warning');
+        isSavingToken = false; // 修复：重置状态
         tokenInput.focus();
         tokenInput.select();
         return;
     }
     
-    showMessage('正在测试Token...', 'info');
+    // 先测试Token是否有效
+    showMessage('正在验证Token有效性...', 'info');
     
     const isValid = await testGitHubTokenWithToken(token);
-    if (isValid) {
-        showMessage('✅ Token验证成功！可以正常访问GitHub仓库', 'success');
-        tokenInput.style.borderColor = '#2ecc71';
-        tokenInput.style.borderWidth = '2px';
-        
-        // 3秒后恢复边框样式
-        setTimeout(() => {
-            tokenInput.style.borderColor = '';
-            tokenInput.style.borderWidth = '';
-        }, 3000);
+    if (!isValid) {
+        isSavingToken = false; // 修复：重置状态
+        return;
     }
-}// 移除GitHub Token
+    
+    // 保存Token到本地存储（所有管理员共享）
+    githubToken = token;
+    localStorage.setItem(CONFIG.storageKeys.githubToken, token);
+    
+    hideGitHubTokenModal();
+    
+    // 更新UI状态
+    updateTokenStatusUI();
+    updateSyncUI();
+    
+    showMessage('GitHub Token配置成功！所有管理员现在都可以上传数据到云端', 'success');
+    
+    // ============ 修复：确保全局变量同步 ============
+    // 确保所有使用Token的地方都更新了
+    setTimeout(() => {
+        forceUpdateTokenUsage();
+    }, 100);
+    
+    // 立即尝试上传一次数据
+    setTimeout(() => {
+        uploadToGitHub();
+    }, 500);
+    
+    // ============ 修复：最后重置状态 ============
+    setTimeout(() => {
+        isSavingToken = false;
+    }, 1000);
+}
+
+// 测试当前保存的GitHub Token
+async function testGitHubToken() {
+    // ============ 修复：优先检查全局变量，然后检查localStorage ============
+    let tokenToTest = githubToken;
+    if (!tokenToTest) {
+        tokenToTest = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        if (tokenToTest) {
+            githubToken = tokenToTest;
+            console.log('从localStorage恢复Token');
+        }
+    }
+    // ===================================================================
+    
+    if (!tokenToTest) {
+        showMessage('未配置GitHub Token', 'warning');
+        return;
+    }
+    
+    showMessage('正在测试当前Token...', 'info');
+    
+    const isValid = await testGitHubTokenWithToken(tokenToTest);
+    if (isValid) {
+        showMessage('当前Token验证成功！可以正常上传数据', 'success');
+    }
+}
+
+// 移除GitHub Token
 function removeGitHubToken() {
     const confirmed = confirm('确定要移除GitHub Token吗？移除后将无法上传数据到云端。');
     
@@ -468,11 +517,25 @@ function removeGitHubToken() {
     githubToken = '';
     localStorage.removeItem(CONFIG.storageKeys.githubToken);
     
-    // 更新UI状态
     updateTokenStatusUI();
     updateSyncUI();
     
     showMessage('GitHub Token已移除', 'info');
+}
+
+// 强制更新Token使用（修复全局变量问题）
+function forceUpdateTokenUsage() {
+    console.log('强制更新Token使用...');
+    
+    const storedToken = localStorage.getItem(CONFIG.storageKeys.githubToken);
+    if (storedToken && !githubToken) {
+        githubToken = storedToken;
+        console.log('✅ 已从localStorage恢复githubToken');
+    }
+    
+    if (githubToken) {
+        console.log('当前有效的Token:', githubToken.substring(0, 4) + '...');
+    }
 }
 
 // 切换Token显示/隐藏
@@ -483,7 +546,6 @@ function toggleTokenVisibility() {
     if (tokenDisplay.type === 'password') {
         tokenDisplay.type = 'text';
         if (githubToken) {
-            // 显示部分Token（隐藏中间部分）
             const visibleToken = githubToken.substring(0, 4) + '...' + githubToken.substring(githubToken.length - 4);
             tokenDisplay.value = visibleToken;
         }
@@ -495,7 +557,6 @@ function toggleTokenVisibility() {
 
 // 更新Token状态UI
 function updateTokenStatusUI() {
-    // 更新导航栏Token状态指示器
     const tokenIndicator = document.getElementById('tokenStatusIndicator');
     if (tokenIndicator) {
         if (githubToken) {
@@ -509,7 +570,6 @@ function updateTokenStatusUI() {
         }
     }
     
-    // 更新同步设置中的Token状态
     const tokenStatusEl = document.getElementById('githubTokenStatus');
     if (tokenStatusEl) {
         if (githubToken) {
@@ -521,13 +581,11 @@ function updateTokenStatusUI() {
         }
     }
     
-    // 更新Token显示框
     const tokenDisplay = document.getElementById('currentTokenDisplay');
     if (tokenDisplay) {
         tokenDisplay.value = githubToken ? '••••••••••••••••' : '未配置Token';
     }
     
-    // 更新配置按钮状态
     const configBtn = document.getElementById('configureTokenBtn');
     if (configBtn) {
         configBtn.innerHTML = githubToken ? 
@@ -541,7 +599,6 @@ function updateTokenStatusUI() {
 // ============================================
 
 function initSync() {
-    // 网络状态监听
     window.addEventListener('online', () => {
         isOnline = true;
         updateNetworkStatus();
@@ -555,14 +612,12 @@ function initSync() {
         updateNetworkStatus();
     });
     
-    // 页面可见性监听
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden && syncEnabled && isOnline) {
             checkAndSync();
         }
     });
     
-    // 启动定时同步
     if (syncEnabled) {
         startSyncInterval();
     }
@@ -602,11 +657,9 @@ async function checkAndSync() {
     try {
         console.log('开始检查云端数据更新...');
         
-        // 1. 从GitHub获取数据
         const cloudData = await fetchFromGitHub();
         
         if (cloudData) {
-            // 2. 检查是否有更新
             if (cloudData.gitHash !== lastGitHash) {
                 console.log('检测到云端数据有更新，开始同步...');
                 await syncWithCloud(cloudData);
@@ -614,17 +667,25 @@ async function checkAndSync() {
                 console.log('云端数据未更新，跳过同步');
             }
         } else {
-            // 云端没有数据
             console.log('云端数据为空');
             
-            // 如果有Token，尝试上传本地数据
-            if (githubToken && currentAdmin) {
+            // ============ 修复：确保Token检查正确 ============
+            let tokenToUse = githubToken;
+            if (!tokenToUse) {
+                tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+                if (tokenToUse) {
+                    githubToken = tokenToUse;
+                    console.log('同步时从localStorage恢复Token');
+                }
+            }
+            
+            if (tokenToUse && currentAdmin) {
                 console.log('尝试上传本地数据到云端...');
                 await uploadToGitHub();
             }
+            // ==============================================
         }
         
-        // 更新同步时间
         lastSyncTime = Date.now();
         localStorage.setItem(CONFIG.storageKeys.lastSyncTime, lastSyncTime.toString());
         
@@ -644,7 +705,6 @@ async function fetchFromGitHub() {
     try {
         console.log('从GitHub获取数据...');
         
-        // 使用GitHub Pages URL（无需认证）
         const response = await fetch(CONFIG.github.pagesUrl + '?t=' + Date.now(), {
             headers: {
                 'Accept': 'application/json',
@@ -663,13 +723,18 @@ async function fetchFromGitHub() {
         const data = await response.json();
         console.log('从GitHub获取数据成功，条数:', data.schedules ? data.schedules.length : 0);
         
-        // 获取文件hash（如果有Token的话）
         let gitHash = '';
-        if (githubToken) {
+        // ============ 修复：确保Token检查正确 ============
+        let tokenToUse = githubToken;
+        if (!tokenToUse) {
+            tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        }
+        
+        if (tokenToUse) {
             try {
                 const apiResponse = await fetch(CONFIG.github.apiUrl, {
                     headers: {
-                        'Authorization': `token ${githubToken}`,
+                        'Authorization': `token ${tokenToUse}`,
                         'Accept': 'application/vnd.github.v3+json'
                     }
                 });
@@ -682,6 +747,7 @@ async function fetchFromGitHub() {
                 console.log('无法获取文件hash:', apiError.message);
             }
         }
+        // ==============================================
         
         return {
             schedules: data.schedules || [],
@@ -695,8 +761,19 @@ async function fetchFromGitHub() {
     }
 }
 
+// 上传到GitHub（已修复Token检查问题）
 async function uploadToGitHub() {
-    if (!githubToken) {
+    // ============ 修复：更健壮的Token检查 ============
+    let tokenToUse = githubToken;
+    if (!tokenToUse) {
+        tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        if (tokenToUse) {
+            githubToken = tokenToUse;
+            console.log('上传前从localStorage恢复Token');
+        }
+    }
+    
+    if (!tokenToUse) {
         console.log('未配置GitHub Token，跳过上传');
         return false;
     }
@@ -705,6 +782,7 @@ async function uploadToGitHub() {
         console.log('未登录管理员账号，跳过上传');
         return false;
     }
+    // ==============================================
     
     try {
         console.log('上传数据到GitHub...');
@@ -724,12 +802,11 @@ async function uploadToGitHub() {
         const content = JSON.stringify(data, null, 2);
         const contentEncoded = btoa(unescape(encodeURIComponent(content)));
         
-        // 首先获取当前文件信息（如果存在）
         let currentFile = null;
         try {
             const response = await fetch(CONFIG.github.apiUrl, {
                 headers: {
-                    'Authorization': `token ${githubToken}`,
+                    'Authorization': `token ${tokenToUse}`,
                     'Accept': 'application/vnd.github.v3+json'
                 }
             });
@@ -738,18 +815,15 @@ async function uploadToGitHub() {
                 currentFile = await response.json();
             }
         } catch (error) {
-            // 文件可能不存在，这是正常的
             console.log('GitHub文件不存在，将创建新文件');
         }
         
-        // 准备上传数据
         const uploadData = {
             message: `时间管理系统数据同步 - ${currentAdmin.name} - ${new Date().toLocaleString('zh-CN')}`,
             content: contentEncoded,
             branch: CONFIG.github.branch
         };
         
-        // 如果文件已存在，添加sha用于更新
         if (currentFile && currentFile.sha) {
             uploadData.sha = currentFile.sha;
         }
@@ -757,7 +831,7 @@ async function uploadToGitHub() {
         const response = await fetch(CONFIG.github.apiUrl, {
             method: 'PUT',
             headers: {
-                'Authorization': `token ${githubToken}`,
+                'Authorization': `token ${tokenToUse}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/vnd.github.v3+json'
             },
@@ -767,7 +841,6 @@ async function uploadToGitHub() {
         if (!response.ok) {
             const errorText = await response.text();
             
-            // 如果token无效，清除本地Token
             if (response.status === 401) {
                 showMessage('GitHub Token无效或已过期，请重新配置', 'error');
                 removeGitHubToken();
@@ -792,18 +865,27 @@ async function uploadToGitHub() {
     }
 }
 
-// 手动上传到GitHub
+// 手动上传到GitHub（已修复）
 async function uploadToGitHubNow() {
     if (!currentAdmin) {
         showMessage('请先登录管理员账号', 'warning');
         return;
     }
     
-    if (!githubToken) {
-        showMessage('请先配置GitHub Token', 'warning');
-        configureGitHubToken();
-        return;
+    // ============ 修复：更友好的提示 ============
+    let tokenToUse = githubToken;
+    if (!tokenToUse) {
+        tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        if (tokenToUse) {
+            githubToken = tokenToUse;
+            console.log('手动上传前恢复Token');
+        } else {
+            showMessage('请先配置GitHub Token', 'warning');
+            configureGitHubToken();
+            return;
+        }
     }
+    // ============================================
     
     showMessage('开始上传数据到GitHub...', 'info');
     await uploadToGitHub();
@@ -817,39 +899,39 @@ async function syncWithCloud(cloudData) {
     
     console.log('开始数据同步，本地:', localSchedules.length, '条，云端:', cloudSchedules.length, '条');
     
-    // 检查冲突
     const conflicts = detectConflicts(localSchedules, cloudSchedules);
     
     if (conflicts.length > 0) {
         console.log('发现', conflicts.length, '个冲突');
         
         if (CONFIG.sync.autoResolve) {
-            // 自动解决冲突
             autoResolveConflicts(conflicts, localSchedules, cloudSchedules);
         } else {
-            // 简化处理：显示提示
             showMessage(`发现${conflicts.length}个数据冲突，已自动解决`, 'warning');
             autoResolveConflicts(conflicts, localSchedules, cloudSchedules);
         }
     }
     
-    // 合并数据
     mergeSchedules(localSchedules, cloudSchedules);
     mergeAdmins(localAdmins, cloudAdmins);
     
-    // 保存并更新界面
     saveSchedules();
     saveAdminUsers();
     loadSchedules();
     
-    // 保存git hash
     lastGitHash = cloudData.gitHash;
     localStorage.setItem(CONFIG.storageKeys.lastGitHash, lastGitHash);
     
-    // 如果登录的是管理员且有Token，尝试上传合并后的数据
-    if (githubToken && currentAdmin && autoUploadEnabled) {
+    // ============ 修复：确保Token检查正确 ============
+    let tokenToUse = githubToken;
+    if (!tokenToUse) {
+        tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+    }
+    
+    if (tokenToUse && currentAdmin && autoUploadEnabled) {
         setTimeout(() => uploadToGitHub(), 1000);
     }
+    // ==============================================
     
     showMessage('数据已同步更新', 'success');
 }
@@ -859,15 +941,12 @@ function detectConflicts(localSchedules, cloudSchedules) {
     const localMap = new Map();
     const cloudMap = new Map();
     
-    // 构建ID映射
     localSchedules.forEach(s => localMap.set(s.id, s));
     cloudSchedules.forEach(s => cloudMap.set(s.id, s));
     
-    // 检查冲突
     for (const [id, localSchedule] of localMap) {
         const cloudSchedule = cloudMap.get(id);
         if (cloudSchedule) {
-            // 检查内容是否相同
             if (!isScheduleEqual(localSchedule, cloudSchedule)) {
                 conflicts.push({
                     id: id,
@@ -890,19 +969,16 @@ function isScheduleEqual(s1, s2) {
 }
 
 function autoResolveConflicts(conflicts, localSchedules, cloudSchedules) {
-    // 简单的自动解决策略：保留最新的修改
     conflicts.forEach(conflict => {
         const localTime = new Date(conflict.local.updatedAt || conflict.local.createdAt || 0).getTime();
         const cloudTime = new Date(conflict.cloud.updatedAt || conflict.cloud.createdAt || 0).getTime();
         
         if (cloudTime > localTime) {
-            // 使用云端版本
             const index = localSchedules.findIndex(s => s.id === conflict.id);
             if (index !== -1) {
                 localSchedules[index] = JSON.parse(JSON.stringify(conflict.cloud));
             }
         }
-        // 否则保留本地版本（不需要操作）
     });
     
     console.log('已自动解决', conflicts.length, '个冲突');
@@ -911,22 +987,18 @@ function autoResolveConflicts(conflicts, localSchedules, cloudSchedules) {
 function mergeSchedules(localSchedules, cloudSchedules) {
     const scheduleMap = new Map();
     
-    // 先添加所有云端计划
     cloudSchedules.forEach(schedule => {
         if (schedule.id) {
             scheduleMap.set(schedule.id, schedule);
         }
     });
     
-    // 添加或更新本地计划（本地可能有一些云端没有的新计划）
     localSchedules.forEach(localSchedule => {
         if (!scheduleMap.has(localSchedule.id)) {
             scheduleMap.set(localSchedule.id, localSchedule);
         }
-        // 如果已存在，已在冲突解决中处理
     });
     
-    // 更新数组
     schedules.length = 0;
     scheduleMap.forEach(schedule => {
         schedules.push(schedule);
@@ -936,26 +1008,22 @@ function mergeSchedules(localSchedules, cloudSchedules) {
 function mergeAdmins(localAdmins, cloudAdmins) {
     const adminMap = new Map();
     
-    // 先添加所有云端管理员（不包含密码）
     cloudAdmins.forEach(cloudAdmin => {
         adminMap.set(cloudAdmin.username, {
             username: cloudAdmin.username,
             name: cloudAdmin.name,
-            password: 'default123' // 设置默认密码，需要用户自己修改
+            password: 'default123'
         });
     });
     
-    // 添加本地管理员（保留密码）
     localAdmins.forEach(localAdmin => {
         if (adminMap.has(localAdmin.username)) {
-            // 保留现有管理员的密码
             adminMap.get(localAdmin.username).password = localAdmin.password;
         } else {
             adminMap.set(localAdmin.username, localAdmin);
         }
     });
     
-    // 更新数组
     adminUsers.length = 0;
     adminMap.forEach(admin => adminUsers.push(admin));
 }
@@ -980,31 +1048,26 @@ async function forceSyncNow() {
 // ============================================
 
 function updateSyncUI() {
-    // 更新同步开关
     const toggle = document.getElementById('syncToggle');
     if (toggle) {
         toggle.checked = syncEnabled;
     }
     
-    // 更新自动解决开关
     const resolveToggle = document.getElementById('autoResolveToggle');
     if (resolveToggle) {
         resolveToggle.checked = CONFIG.sync.autoResolve;
     }
     
-    // 更新自动上传开关
     const uploadToggle = document.getElementById('autoUploadToggle');
     if (uploadToggle) {
         uploadToggle.checked = autoUploadEnabled;
     }
     
-    // 更新同步徽章
     const badge = document.getElementById('syncBadge');
     if (badge) {
         badge.style.display = syncEnabled ? 'inline-flex' : 'none';
     }
     
-    // 更新主界面状态文本
     const statusText = document.getElementById('syncStatusText');
     if (statusText) {
         if (syncEnabled) {
@@ -1019,7 +1082,6 @@ function updateSyncUI() {
         }
     }
     
-    // 更新同步状态显示
     const syncStatusEl = document.getElementById('syncActiveStatus');
     if (syncStatusEl) {
         if (syncEnabled) {
@@ -1035,7 +1097,6 @@ function updateSyncUI() {
         }
     }
     
-    // 更新统计数据
     updateStatsDisplay();
 }
 
@@ -1132,13 +1193,11 @@ function updateLastSyncTimeDisplay() {
 }
 
 function updateStatsDisplay() {
-    // 更新数据版本显示
     const versionEl = document.getElementById('dataVersionDisplay');
     if (versionEl) {
         versionEl.textContent = `v2.0 (${schedules.length}条)`;
     }
     
-    // 更新本地和云端计数
     const localCountEl = document.getElementById('localScheduleCount');
     const cloudCountEl = document.getElementById('cloudScheduleCount');
     
@@ -1146,10 +1205,8 @@ function updateStatsDisplay() {
         localCountEl.textContent = `${schedules.length} 条`;
     }
     
-    // 云端计数需要异步获取
     if (cloudCountEl) {
         cloudCountEl.textContent = '加载中...';
-        // 异步获取云端计数
         fetchFromGitHub().then(cloudData => {
             if (cloudData && cloudData.schedules) {
                 cloudCountEl.textContent = `${cloudData.schedules.length} 条`;
@@ -1213,7 +1270,6 @@ function resetLocalData() {
         saveSchedules();
         loadSchedules();
         
-        // 重置同步状态
         lastSyncTime = 0;
         lastGitHash = '';
         localStorage.removeItem(CONFIG.storageKeys.lastSyncTime);
@@ -1222,7 +1278,6 @@ function resetLocalData() {
         updateLastSyncTimeDisplay();
         showMessage('本地数据已清空', 'success');
         
-        // 重新从云端加载数据
         if (syncEnabled && isOnline) {
             setTimeout(() => checkAndSync(), 1000);
         }
@@ -1244,7 +1299,6 @@ function initMobileOptimization() {
         optimizeTableForMobile();
     }
     
-    // 监听窗口大小变化
     window.addEventListener('resize', function() {
         optimizeTableForMobile();
         updateTableLayout();
@@ -1271,7 +1325,6 @@ function updateTableLayout() {
     const table = tableContainer.querySelector('.schedule-table');
     if (!table) return;
     
-    // 检查是否需要滚动提示
     const scrollHint = document.getElementById('scrollHint');
     if (window.innerWidth <= 768 && table.scrollWidth > tableContainer.clientWidth) {
         if (scrollHint) {
@@ -1297,7 +1350,6 @@ function checkForScrollHint() {
 function selectStatus(status) {
     selectedStatus = status;
     
-    // 更新按钮样式
     const freeBtn = document.querySelector('.status-free');
     const busyBtn = document.querySelector('.status-busy');
     
@@ -1385,14 +1437,12 @@ async function performLogin() {
         return;
     }
     
-    // 登录按钮状态
     const loginBtn = document.querySelector('#loginModal .btn-primary');
     if (loginBtn) {
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中';
         loginBtn.disabled = true;
     }
     
-    // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 300));
     
     const admin = adminUsers.find(u => u.username === username && u.password === password);
@@ -1412,7 +1462,6 @@ async function performLogin() {
         showMessage('登录成功', 'success');
         loadSchedules();
         
-        // 登录后立即同步一次
         if (syncEnabled && isOnline) {
             setTimeout(() => checkAndSync(), 1000);
         }
@@ -1425,7 +1474,6 @@ async function performLogin() {
         }
     }
     
-    // 恢复登录按钮状态
     if (loginBtn) {
         loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
         loginBtn.disabled = false;
@@ -1459,7 +1507,6 @@ function updateUserUI() {
     }
     
     if (currentAdmin) {
-        // 已登录状态
         navUser.innerHTML = `
             <span class="admin-indicator">
                 <i class="fas fa-user-shield"></i>
@@ -1475,7 +1522,6 @@ function updateUserUI() {
         systemAlert.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
         
     } else {
-        // 未登录状态
         navUser.innerHTML = `
             <button class="btn btn-primary" onclick="showLoginModal()">
                 <i class="fas fa-sign-in-alt"></i> 管理员登录
@@ -1555,7 +1601,6 @@ function loadSchedules() {
     emptyState.style.display = 'none';
     updateStats(freeCount, busyCount);
     
-    // 检查滚动提示
     setTimeout(() => {
         checkForScrollHint();
     }, 100);
@@ -1618,16 +1663,21 @@ function addSchedule() {
     saveSchedules();
     loadSchedules();
     
-    // 清空输入框
     startTimeInput.value = '';
     endTimeInput.value = '';
     
     showMessage('时间段添加成功', 'success');
     
-    // 触发同步（如果有Token且启用自动上传）
-    if (githubToken && autoUploadEnabled) {
+    // ============ 修复：确保Token检查正确 ============
+    let tokenToUse = githubToken;
+    if (!tokenToUse) {
+        tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+    }
+    
+    if (tokenToUse && autoUploadEnabled) {
         scheduleSync();
     }
+    // ==============================================
 }
 
 function checkTimeConflict(date, startTime, endTime) {
@@ -1674,26 +1724,37 @@ async function deleteSchedule(index) {
             loadSchedules();
             showMessage('时间段删除成功', 'success');
             
-            // 触发同步（如果有Token且启用自动上传）
-            if (githubToken && autoUploadEnabled) {
+            // ============ 修复：确保Token检查正确 ============
+            let tokenToUse = githubToken;
+            if (!tokenToUse) {
+                tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+            }
+            
+            if (tokenToUse && autoUploadEnabled) {
                 scheduleSync();
             }
+            // ==============================================
         }
     }
 }
 
 function scheduleSync() {
-    // 防抖处理，避免频繁同步
     if (syncTimeout) clearTimeout(syncTimeout);
     
     syncTimeout = setTimeout(() => {
         if (syncEnabled && isOnline && !isSyncing) {
             checkAndSync();
             
-            // 如果有GitHub Token并且启用自动上传，尝试上传到GitHub
-            if (githubToken && currentAdmin && autoUploadEnabled) {
+            // ============ 修复：确保Token检查正确 ============
+            let tokenToUse = githubToken;
+            if (!tokenToUse) {
+                tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+            }
+            
+            if (tokenToUse && currentAdmin && autoUploadEnabled) {
                 setTimeout(() => uploadToGitHub(), 1000);
             }
+            // ==============================================
         }
     }, 2000);
 }
@@ -1713,12 +1774,8 @@ function openSyncSettings() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // 更新统计信息
         updateStatsDisplay();
-        
-        // 更新Token状态
         updateTokenStatusUI();
-        
         updateLastSyncTimeDisplay();
     }
 }
@@ -1746,7 +1803,6 @@ function openAdminSettings() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // 显示当前账号信息
         const currentAccountEl = document.getElementById('currentAccount');
         const editAdminNameEl = document.getElementById('editAdminName');
         
@@ -1767,7 +1823,6 @@ function hideAdminSettings() {
         modal.style.display = 'none';
         document.body.style.overflow = '';
         
-        // 清空表单
         const inputs = modal.querySelectorAll('input[type="password"], input[type="text"]');
         inputs.forEach(input => {
             if (input.id !== 'editAdminName') {
@@ -1788,7 +1843,6 @@ function updateAdminName() {
         return;
     }
     
-    // 更新当前管理员昵称
     const adminIndex = adminUsers.findIndex(admin => admin.username === currentAdmin.username);
     if (adminIndex !== -1) {
         adminUsers[adminIndex].name = newName;
@@ -1796,7 +1850,6 @@ function updateAdminName() {
         
         saveAdminUsers();
         
-        // 更新所有相关的时间安排
         schedules.forEach(schedule => {
             if (schedule.createdBy === currentAdmin.username) {
                 schedule.adminName = newName;
@@ -1810,10 +1863,16 @@ function updateAdminName() {
         
         showMessage('昵称更新成功', 'success');
         
-        // 触发同步（如果有Token且启用自动上传）
-        if (githubToken && autoUploadEnabled) {
+        // ============ 修复：确保Token检查正确 ============
+        let tokenToUse = githubToken;
+        if (!tokenToUse) {
+            tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        }
+        
+        if (tokenToUse && autoUploadEnabled) {
             scheduleSync();
         }
+        // ==============================================
     }
 }
 
@@ -1855,17 +1914,22 @@ async function changePassword() {
         
         saveAdminUsers();
         
-        // 清空密码字段
         currentPasswordEl.value = '';
         newPasswordEl.value = '';
         confirmPasswordEl.value = '';
         
         showMessage('密码修改成功', 'success');
         
-        // 触发同步（如果有Token且启用自动上传）
-        if (githubToken && autoUploadEnabled) {
+        // ============ 修复：确保Token检查正确 ============
+        let tokenToUse = githubToken;
+        if (!tokenToUse) {
+            tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        }
+        
+        if (tokenToUse && autoUploadEnabled) {
             scheduleSync();
         }
+        // ==============================================
     }
 }
 
@@ -1926,17 +1990,22 @@ async function addNewAdmin() {
     saveAdminUsers();
     loadAdminList();
     
-    // 清空表单
     usernameInput.value = '';
     passwordInput.value = '';
     nameInput.value = '';
     
     showMessage(`管理员 ${name} 添加成功`, 'success');
     
-    // 触发同步（如果有Token且启用自动上传）
-    if (githubToken && autoUploadEnabled) {
+    // ============ 修复：确保Token检查正确 ============
+    let tokenToUse = githubToken;
+    if (!tokenToUse) {
+        tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+    }
+    
+    if (tokenToUse && autoUploadEnabled) {
         scheduleSync();
     }
+    // ==============================================
 }
 
 async function removeAdmin(index) {
@@ -1959,10 +2028,16 @@ async function removeAdmin(index) {
         loadAdminList();
         showMessage('管理员移除成功', 'success');
         
-        // 触发同步（如果有Token且启用自动上传）
-        if (githubToken && autoUploadEnabled) {
+        // ============ 修复：确保Token检查正确 ============
+        let tokenToUse = githubToken;
+        if (!tokenToUse) {
+            tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+        }
+        
+        if (tokenToUse && autoUploadEnabled) {
             scheduleSync();
         }
+        // ==============================================
     }
 }
 
@@ -2058,10 +2133,16 @@ async function importData(event) {
                 loadSchedules();
                 showMessage('数据导入成功', 'success');
                 
-                // 触发同步（如果有Token且启用自动上传）
-                if (githubToken && autoUploadEnabled) {
+                // ============ 修复：确保Token检查正确 ============
+                let tokenToUse = githubToken;
+                if (!tokenToUse) {
+                    tokenToUse = localStorage.getItem(CONFIG.storageKeys.githubToken);
+                }
+                
+                if (tokenToUse && autoUploadEnabled) {
                     scheduleSync();
                 }
+                // ==============================================
             }
             
         } catch (error) {
@@ -2103,18 +2184,30 @@ function generateId() {
 }
 
 function showMessage(message, type = 'info') {
-    switch (type) {
-        case 'success':
-            toastr.success(message);
-            break;
-        case 'error':
-            toastr.error(message);
-            break;
-        case 'warning':
-            toastr.warning(message);
-            break;
-        default:
-            toastr.info(message);
+    // ============ 修复：添加toastr安全性检查 ============
+    if (typeof toastr === 'undefined') {
+        console.log(`${type}: ${message}`);
+        showFallbackMessage(message, type);
+        return;
+    }
+    
+    try {
+        switch (type) {
+            case 'success':
+                toastr.success(message);
+                break;
+            case 'error':
+                toastr.error(message);
+                break;
+            case 'warning':
+                toastr.warning(message);
+                break;
+            default:
+                toastr.info(message);
+        }
+    } catch (error) {
+        console.log(`${type}: ${message}`);
+        showFallbackMessage(message, type);
     }
 }
 
@@ -2232,7 +2325,6 @@ function initKeyboardSupport() {
 function handleEnterKey(event) {
     const activeElement = document.activeElement;
     
-    // 登录模态框
     if (activeElement.id === 'loginUsername' || activeElement.id === 'loginPassword') {
         if (document.getElementById('loginModal').style.display === 'flex') {
             event.preventDefault();
@@ -2245,7 +2337,6 @@ function handleEnterKey(event) {
         }
     }
     
-    // 时间设置
     if (activeElement.id === 'startTime' || activeElement.id === 'endTime') {
         if (currentAdmin) {
             event.preventDefault();
@@ -2258,7 +2349,6 @@ function handleEnterKey(event) {
         }
     }
     
-    // GitHub Token输入
     if (activeElement.id === 'githubTokenInput') {
         if (document.getElementById('githubTokenModal').style.display === 'flex') {
             event.preventDefault();
@@ -2285,7 +2375,6 @@ function handleEscapeKey() {
 }
 
 function setupInputKeyboard() {
-    // 时间输入框
     const startTimeInput = document.getElementById('startTime');
     const endTimeInput = document.getElementById('endTime');
     
@@ -2309,7 +2398,6 @@ function setupInputKeyboard() {
         };
     }
     
-    // 登录输入框
     const loginUsername = document.getElementById('loginUsername');
     const loginPassword = document.getElementById('loginPassword');
     
@@ -2329,7 +2417,6 @@ function setupInputKeyboard() {
         };
     }
     
-    // GitHub Token输入框
     const githubTokenInput = document.getElementById('githubTokenInput');
     if (githubTokenInput) {
         githubTokenInput.onkeydown = function(event) {
@@ -2345,79 +2432,86 @@ function setupInputKeyboard() {
 // 页面生命周期管理
 // ============================================
 
-// 页面可见性变化
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden && syncEnabled && isOnline) {
-        // 页面重新可见时检查同步
         checkAndSync();
     }
 });
 
-// 防止页面离开时数据丢失
 window.addEventListener('beforeunload', function() {
     saveSchedules();
     saveAdminUsers();
 });
 
-// 页面加载完成
 window.addEventListener('load', function() {
     console.log('页面完全加载完成，系统已就绪');
     console.log('GitHub配置：', CONFIG.github);
     console.log('Token状态：', githubToken ? '已配置' : '未配置');
     
-    // 最终检查表格显示
     setTimeout(() => {
         updateTableLayout();
     }, 1000);
 });
 
-console.log('时间管理系统初始化完成，版本：GitHub云同步版 v2.0（所有管理员均可配置Token）');
+// ============================================
+// 按钮事件绑定修复
+// ============================================
+
+function rebindButtonEvents() {
+    console.log('重新绑定按钮事件...');
+    
+    // 修复Token相关按钮
+    const testTokenBtn = document.getElementById('testTokenBtn');
+    const saveTokenBtn = document.getElementById('saveTokenBtn');
+    
+    if (testTokenBtn) {
+        // 移除旧的事件监听器
+        const newTestBtn = testTokenBtn.cloneNode(true);
+        testTokenBtn.parentNode.replaceChild(newTestBtn, testTokenBtn);
+    }
+    
+    if (saveTokenBtn) {
+        // 移除旧的事件监听器
+        const newSaveBtn = saveTokenBtn.cloneNode(true);
+        saveTokenBtn.parentNode.replaceChild(newSaveBtn, saveTokenBtn);
+    }
+    
+    // 重新绑定（通过事件委托）
+    setTimeout(() => {
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+            
+            const buttonId = button.id || '';
+            
+            if (buttonId === 'testTokenBtn') {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('点击测试Token按钮');
+                testGitHubTokenInput();
+                return;
+            }
+            
+            if (buttonId === 'saveTokenBtn') {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('点击保存Token按钮');
+                saveGitHubToken();
+                return;
+            }
+        });
+        
+        console.log('✅ 按钮事件重新绑定完成');
+    }, 100);
+}
+
+// 初始化完成消息
+console.log('时间管理系统初始化完成，版本：GitHub云同步版 v2.0（修复版）');
 console.log('GitHub仓库：', CONFIG.github.rawUrl);
 console.log('Token状态：', githubToken ? '已配置' : '未配置');
-// 强制绑定所有按钮事件（确保在最后执行）
-(function bindAllButtons() {
-    console.log('开始绑定所有按钮事件...');
-    
-    // 绑定所有测试Token按钮
-    document.addEventListener('click', function(event) {
-        const button = event.target.closest('button');
-        if (!button) return;
-        
-        const buttonText = button.textContent || '';
-        const buttonId = button.id || '';
-        
-        // 测试Token按钮
-        if (buttonText.includes('测试Token') || buttonId.includes('testToken')) {
-            console.log('点击了测试Token按钮');
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // 判断是在哪个模态框
-            if (document.getElementById('githubTokenModal')?.style.display === 'flex') {
-                // 在Token配置模态框中
-                testGitHubTokenInput();
-            } else {
-                // 在同步设置中
-                testGitHubToken();
-            }
-        }
-        
-        // 保存Token按钮
-        if (buttonText.includes('保存Token') || buttonId.includes('saveToken')) {
-            console.log('点击了保存Token按钮');
-            event.preventDefault();
-            event.stopPropagation();
-            saveGitHubToken();
-        }
-        
-        // 配置Token按钮
-        if (buttonText.includes('配置Token') || buttonText.includes('配置GitHub')) {
-            console.log('点击了配置Token按钮');
-            event.preventDefault();
-            event.stopPropagation();
-            configureGitHubToken();
-        }
-    });
-    
-    console.log('按钮事件绑定完成');
-})();
+console.log('修复内容：');
+console.log('1. Token保存防重复点击');
+console.log('2. Token空值检查');
+console.log('3. toastr安全性检查');
+console.log('4. 全局Token变量同步修复');
+console.log('5. 按钮事件绑定修复');
