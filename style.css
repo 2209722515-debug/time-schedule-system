@@ -4,6 +4,7 @@
     --secondary-color: #2ecc71;
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
+    --github-color: #24292e;
     --dark-color: #2c3e50;
     --light-color: #ecf0f1;
     --gray-color: #95a5a6;
@@ -23,7 +24,7 @@ body {
     background: #f5f7fa;
     color: var(--dark-color);
     line-height: 1.6;
-    -webkit-text-size-adjust: 100%; /* 防止手机端字体缩放 */
+    -webkit-text-size-adjust: 100%;
 }
 
 .container {
@@ -67,24 +68,6 @@ body {
     font-size: 14px;
 }
 
-.sync-badge {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-color);
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: normal;
-    margin-left: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.header-actions {
-    display: flex;
-    gap: 10px;
-}
-
 /* 卡片样式 */
 .card {
     background: white;
@@ -101,6 +84,49 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+/* 快速指南卡片 */
+.quick-guide-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.quick-guide-card h3 {
+    color: white;
+}
+
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.guide-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.step-number {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: white;
+    color: var(--primary-color);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.step-text {
+    flex: 1;
+    font-size: 14px;
 }
 
 /* 日期选择 */
@@ -160,7 +186,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 44px; /* 手机触摸友好 */
+    min-height: 44px;
 }
 
 .btn:hover {
@@ -218,6 +244,26 @@ body {
     background: #e67e22;
 }
 
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #138496;
+}
+
+.btn-github {
+    background: linear-gradient(135deg, var(--github-color) 0%, #3b434d 100%);
+    color: white;
+    border: none;
+}
+
+.btn-github:hover {
+    background: linear-gradient(135deg, #3b434d 0%, var(--github-color) 100%);
+    color: white;
+}
+
 .btn-outline {
     background: transparent;
     border: 2px solid var(--primary-color);
@@ -239,12 +285,6 @@ body {
     min-height: 36px;
 }
 
-.btn-xs {
-    padding: 4px 8px;
-    font-size: 11px;
-    min-height: 28px;
-}
-
 /* 管理员卡片 */
 .admin-card {
     border-left: 4px solid var(--primary-color);
@@ -255,8 +295,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 15px;
 }
 
 .time-setter {
@@ -283,7 +321,7 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
-    min-height: 44px; /* 手机触摸友好 */
+    min-height: 44px;
 }
 
 .status-btn:hover {
@@ -332,11 +370,11 @@ input[type="text"],
 input[type="password"],
 input[type="date"] {
     width: 100%;
-    padding: 12px; /* 增加内边距便于触摸 */
+    padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    font-size: 16px; /* 防止手机自动缩放 */
-    min-height: 44px; /* 手机触摸友好 */
+    font-size: 16px;
+    min-height: 44px;
 }
 
 .time-input:focus,
@@ -347,28 +385,39 @@ input[type="date"]:focus {
     border-color: var(--primary-color);
 }
 
-.form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border-color);
+/* GitHub信息卡片 */
+.github-card {
+    border-left: 4px solid var(--github-color);
+}
+
+.github-info-content {
+    margin-top: 15px;
+}
+
+.repo-info {
+    background: #f8f9fa;
+    padding: 15px;
     border-radius: var(--radius);
-    font-size: 14px;
+    margin: 15px 0;
 }
 
-.form-text {
-    font-size: 12px;
-    color: var(--gray-color);
-    margin-top: 5px;
-    display: block;
+.repo-info h4 {
+    margin-bottom: 10px;
 }
 
-.form-text a {
-    color: var(--primary-color);
+.repo-info a {
+    color: var(--github-color);
     text-decoration: none;
 }
 
-.form-text a:hover {
+.repo-info a:hover {
     text-decoration: underline;
+}
+
+.github-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 /* 时间表 */
@@ -404,14 +453,14 @@ input[type="date"]:focus {
     color: var(--danger-color);
 }
 
-.sync-badge {
-    background: rgba(52, 152, 219, 0.2);
-    color: var(--primary-color);
+.cloud-badge {
+    background: rgba(36, 41, 46, 0.2);
+    color: var(--github-color);
 }
 
 .table-responsive {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* 手机平滑滚动 */
+    -webkit-overflow-scrolling: touch;
     position: relative;
 }
 
@@ -440,7 +489,7 @@ input[type="date"]:focus {
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* 确保表格最小宽度 */
+    min-width: 600px;
 }
 
 .schedule-table th {
@@ -508,13 +557,6 @@ input[type="date"]:focus {
     gap: 10px;
 }
 
-.admin-avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
 .action-buttons {
     display: flex;
     gap: 10px;
@@ -554,151 +596,169 @@ input[type="date"]:focus {
     gap: 10px;
 }
 
-/* 同步设置样式 */
-.sync-status-section,
-.sync-control-section,
-.sync-info-section,
-.cloud-sync-section,
-.sync-help-section {
+/* 帮助卡片 */
+.help-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.help-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.help-item i {
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-top: 3px;
+}
+
+.help-item.github i {
+    color: var(--github-color);
+}
+
+.help-item h4 {
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+.help-item p {
+    color: var(--gray-color);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.help-tip {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+/* 快捷操作面板 */
+.quick-actions-panel {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+/* GitHub配置区域 */
+.github-config-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
 }
 
-.sync-status-section:last-child,
-.sync-control-section:last-child,
-.sync-info-section:last-child,
-.cloud-sync-section:last-child,
-.sync-help-section:last-child {
-    border-bottom: none;
+.config-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--radius);
+    margin: 15px 0;
 }
 
-.status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
+.config-info ul {
+    margin: 10px 0;
+    padding-left: 20px;
 }
 
-.status-item {
-    display: flex;
-    flex-direction: column;
+.config-info code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.token-setting {
+    margin: 20px 0;
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--gray-color);
+    margin-top: 10px;
+}
+
+.help-text a {
+    color: var(--primary-color);
+}
+
+/* 登录提示 */
+.login-tips {
+    margin-top: 20px;
     padding: 15px;
     background: #f8f9fa;
     border-radius: var(--radius);
+    font-size: 13px;
 }
 
-.status-label {
-    font-size: 12px;
-    color: var(--gray-color);
-    margin-bottom: 5px;
-}
-
-.status-value {
-    font-weight: 500;
-    font-size: 14px;
+.login-tips p {
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.status-value.online {
-    color: var(--secondary-color);
+/* GitHub帮助步骤 */
+.help-steps {
+    margin: 20px 0;
 }
 
-.status-value.offline {
-    color: var(--danger-color);
+.step {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
 }
 
-.status-value.active {
-    color: var(--primary-color);
+.step:last-child {
+    border-bottom: none;
 }
 
-.status-value.inactive {
-    color: var(--gray-color);
+.step h4 {
+    color: var(--github-color);
+    margin-bottom: 10px;
 }
 
-/* 开关样式 */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+.step ul, .step ol {
+    margin: 10px 0;
+    padding-left: 20px;
 }
 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-.toggle-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.toggle-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.step pre {
+    background: #f6f8fa;
     padding: 15px;
-    background: #f8f9fa;
     border-radius: var(--radius);
+    overflow-x: auto;
+    margin: 10px 0;
+    font-size: 13px;
 }
 
-.toggle-label {
-    font-weight: 500;
+.current-config {
+    margin-top: 30px;
 }
 
-.sync-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+.current-config pre {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
-.sync-info {
-    margin-top: 15px;
+/* 管理员设置 */
+.current-admin-info,
+.change-password-form,
+.admin-list {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.info-item {
+.info-row {
     display: flex;
     align-items: center;
-    gap: 10px;
     margin-bottom: 15px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -710,132 +770,6 @@ input:checked + .slider:before {
 .info-value {
     color: var(--dark-color);
     font-weight: 500;
-}
-
-.sync-key {
-    flex: 1;
-    padding: 8px 12px;
-    background: #f1f3f4;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 12px;
-    word-break: break-all;
-}
-
-.cloud-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-/* 帮助步骤 */
-.help-content {
-    margin-top: 15px;
-}
-
-.help-step {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: var(--radius);
-    border-left: 4px solid var(--primary-color);
-}
-
-.step-number {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background: var(--primary-color);
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 24px;
-    margin-right: 10px;
-    font-size: 12px;
-}
-
-.help-step h5 {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.help-step p {
-    margin-left: 34px;
-    color: var(--gray-color);
-    font-size: 14px;
-}
-
-/* 冲突解决样式 */
-.conflict-options {
-    margin: 20px 0;
-}
-
-.conflict-option {
-    margin-bottom: 15px;
-    padding: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    transition: all 0.3s;
-}
-
-.conflict-option:hover {
-    border-color: var(--primary-color);
-    background: rgba(52, 152, 219, 0.05);
-}
-
-.conflict-option input[type="radio"] {
-    margin-right: 10px;
-}
-
-.conflict-option label {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.conflict-option label strong {
-    margin-bottom: 5px;
-}
-
-.conflict-option label small {
-    color: var(--gray-color);
-    font-size: 12px;
-}
-
-.conflict-preview {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: var(--radius);
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-/* 管理员设置模态框内容 */
-.current-admin-info,
-.change-password-form,
-.add-admin-form,
-.admin-list {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.current-admin-info:last-child,
-.change-password-form:last-child,
-.add-admin-form:last-child,
-.admin-list:last-child {
-    border-bottom: none;
-}
-
-.info-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 10px;
-    flex-wrap: wrap;
 }
 
 .info-input {
@@ -911,6 +845,10 @@ input:checked + .slider:before {
     z-index: 1;
 }
 
+.modal-header.github {
+    background: linear-gradient(135deg, var(--github-color) 0%, #3b434d 100%);
+}
+
 .modal-header h3 {
     margin: 0;
     color: white;
@@ -922,7 +860,7 @@ input:checked + .slider:before {
     color: white;
     font-size: 24px;
     cursor: pointer;
-    width: 44px; /* 手机触摸友好 */
+    width: 44px;
     height: 44px;
     display: flex;
     align-items: center;
@@ -947,46 +885,6 @@ input:checked + .slider:before {
     gap: 15px;
 }
 
-/* 快捷操作面板 */
-.quick-actions-panel {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-    flex-wrap: wrap;
-}
-
-/* 说明卡片 */
-.help-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.help-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-.help-item i {
-    font-size: 24px;
-    color: var(--primary-color);
-    margin-top: 3px;
-}
-
-.help-item h4 {
-    color: var(--dark-color);
-    margin-bottom: 5px;
-}
-
-.help-item p {
-    color: var(--gray-color);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
 /* 脚注 */
 .footer {
     background: var(--dark-color);
@@ -996,96 +894,17 @@ input:checked + .slider:before {
     text-align: center;
 }
 
-/* 同步指示器 */
-.sync-indicator {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 20px;
+.footer a {
+    color: #ddd;
+    text-decoration: none;
 }
 
-.sync-indicator:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-.sync-indicator.syncing i {
-    animation: spin 1s linear infinite;
-}
-
-.sync-indicator.online {
-    color: var(--secondary-color);
-}
-
-.sync-indicator.offline {
-    color: var(--danger-color);
-}
-
-.sync-indicator.inactive {
-    color: var(--gray-color);
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* 自定义确认对话框 */
-.custom-confirm-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    padding: 20px;
-}
-
-.custom-confirm-dialog {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-}
-
-.custom-confirm-content {
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 20px;
-    color: var(--dark-color);
-}
-
-.custom-confirm-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.custom-confirm-buttons .btn {
-    min-width: 80px;
-    min-height: 44px;
+.footer a:hover {
+    text-decoration: underline;
 }
 
 /* ======================
-   增强的响应式设计
+   响应式设计
    ====================== */
 
 /* 平板设备 (768px以下) */
@@ -1114,18 +933,9 @@ input:checked + .slider:before {
         font-size: 16px;
     }
     
-    .sync-badge {
+    .github-badge {
         font-size: 10px;
-        padding: 2px 6px;
-    }
-    
-    .header-actions {
-        gap: 5px;
-    }
-    
-    .header-actions .btn {
-        padding: 6px 10px;
-        font-size: 12px;
+        padding: 2px 8px;
     }
     
     .nav-user {
@@ -1296,41 +1106,39 @@ input:checked + .slider:before {
         font-size: 11px;
     }
     
-    /* 同步设置 */
-    .status-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .sync-actions {
+    /* 帮助卡片 */
+    .help-item {
         flex-direction: column;
-    }
-    
-    .sync-actions .btn {
-        width: 100%;
-    }
-    
-    .toggle-item {
-        flex-direction: column;
-        align-items: flex-start;
         gap: 10px;
     }
     
-    .toggle-item .switch {
+    .help-item i {
         align-self: flex-start;
+        font-size: 20px;
     }
     
-    .info-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
+    .help-item h4 {
+        font-size: 15px;
     }
     
-    .cloud-actions {
-        flex-direction: column;
+    .help-item p {
+        font-size: 13px;
     }
     
-    .cloud-actions .btn {
-        width: 100%;
+    /* 快捷指南 */
+    .guide-step {
+        padding: 10px;
+    }
+    
+    .step-number {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 11px;
+    }
+    
+    .step-text {
+        font-size: 13px;
     }
     
     /* 模态框优化 */
@@ -1367,59 +1175,13 @@ input:checked + .slider:before {
         width: 100%;
     }
     
-    /* 管理员设置表格 */
-    .admin-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        min-width: 500px;
-    }
-    
-    /* 帮助卡片 */
-    .help-item {
+    /* GitHub卡片 */
+    .github-actions {
         flex-direction: column;
-        gap: 10px;
     }
     
-    .help-item i {
-        align-self: flex-start;
-        font-size: 20px;
-    }
-    
-    .help-item h4 {
-        font-size: 15px;
-    }
-    
-    .help-item p {
-        font-size: 13px;
-    }
-    
-    /* 帮助步骤 */
-    .help-step {
-        padding: 12px;
-    }
-    
-    .step-number {
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        font-size: 11px;
-    }
-    
-    .help-step h5 {
-        font-size: 14px;
-    }
-    
-    .help-step p {
-        font-size: 12px;
-        margin-left: 30px;
-    }
-    
-    /* 提示框 */
-    .alert {
-        padding: 12px 20px;
-        font-size: 14px;
-        flex-wrap: wrap;
+    .github-actions .btn {
+        width: 100%;
     }
     
     /* 脚注 */
@@ -1429,8 +1191,8 @@ input:checked + .slider:before {
         font-size: 14px;
     }
     
-    /* 同步指示器 */
-    .sync-indicator {
+    /* 云端指示器 */
+    .cloud-indicator {
         width: 40px;
         height: 40px;
         font-size: 16px;
@@ -1466,8 +1228,8 @@ input:checked + .slider:before {
         font-size: 14px;
     }
     
-    .sync-badge {
-        display: none; /* 在小屏幕上隐藏徽章 */
+    .github-badge {
+        display: none;
     }
     
     .nav-user {
@@ -1533,7 +1295,7 @@ input:checked + .slider:before {
     input[type="password"],
     input[type="date"] {
         padding: 10px;
-        font-size: 16px; /* 防止iOS缩放 */
+        font-size: 16px;
         min-height: 44px;
     }
     
@@ -1614,76 +1376,9 @@ input:checked + .slider:before {
         padding: 3px 6px;
         font-size: 10px;
     }
-    
-    /* 帮助卡片 */
-    .help-item h4 {
-        font-size: 14px;
-    }
-    
-    .help-item p {
-        font-size: 12px;
-    }
 }
 
-/* 横向模式优化 */
-@media (max-height: 500px) and (orientation: landscape) {
-    .main-container {
-        padding-top: 5px;
-    }
-    
-    .card {
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .table-responsive {
-        max-height: 200px;
-    }
-    
-    .modal {
-        align-items: center;
-        padding: 10px;
-    }
-    
-    .modal-dialog {
-        max-height: 80vh;
-    }
-    
-    .modal-body {
-        max-height: 50vh;
-    }
-}
-
-/* 触摸设备优化 */
-@media (hover: none) and (pointer: coarse) {
-    .btn:hover,
-    .status-btn:hover,
-    .close-btn:hover {
-        transform: none;
-    }
-    
-    .btn:active,
-    .status-btn:active {
-        transform: scale(0.98);
-        opacity: 0.9;
-    }
-    
-    /* 增加触摸目标大小 */
-    .action-buttons .btn,
-    .admin-table .btn {
-        min-height: 36px;
-    }
-    
-    .schedule-table td {
-        padding: 12px 10px;
-    }
-    
-    .sync-indicator {
-        min-height: 44px;
-    }
-}
-
-/* 深色模式支持 */
+/* 暗色模式支持 */
 @media (prefers-color-scheme: dark) {
     :root {
         --dark-color: #f8f9fa;
@@ -1724,8 +1419,7 @@ input:checked + .slider:before {
     input[type="text"],
     input[type="password"],
     input[type="date"],
-    .info-input,
-    .form-control {
+    .info-input {
         background: #495057;
         border-color: #6c757d;
         color: #f8f9fa;
@@ -1735,93 +1429,23 @@ input:checked + .slider:before {
     input[type="text"]:focus,
     input[type="password"]:focus,
     input[type="date"]:focus,
-    .info-input:focus,
-    .form-control:focus {
+    .info-input:focus {
         border-color: #3498db;
     }
     
     .form-group label,
-    .info-label,
-    .status-label,
-    .toggle-label {
+    .info-label {
         color: #dee2e6;
     }
     
-    .status-item,
-    .toggle-item,
-    .help-step,
-    .conflict-preview {
+    .config-info,
+    .login-tips,
+    .repo-info {
         background: #2d3748;
     }
     
-    .sync-key {
-        background: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .sync-indicator {
+    .cloud-indicator {
         background: #2d3748;
         color: #e2e8f0;
-    }
-    
-    .badge.free-badge {
-        background: rgba(46, 204, 113, 0.3);
-    }
-    
-    .badge.busy-badge {
-        background: rgba(231, 76, 60, 0.3);
-    }
-    
-    .badge.sync-badge {
-        background: rgba(52, 152, 219, 0.3);
-    }
-}
-
-/* 滚动条样式优化 */
-@media (max-width: 768px) {
-    .table-responsive::-webkit-scrollbar {
-        height: 6px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-}
-
-/* 打印样式 */
-@media print {
-    .navbar,
-    .admin-card,
-    .help-card,
-    .footer,
-    .modal,
-    .action-buttons,
-    .quick-actions-panel,
-    .sync-indicator,
-    .network-status {
-        display: none !important;
-    }
-    
-    .card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
-    
-    .table-responsive {
-        overflow: visible;
-    }
-    
-    .schedule-table {
-        min-width: 100%;
     }
 }

@@ -4,11 +4,12 @@
 
 // 配置
 const CONFIG = {
-    // 默认管理员
-    defaultAdmin: {
-        username: 'admin',
-        password: 'admin123',
-        name: '系统管理员'
+    // GitHub配置 - 您的用户名
+    github: {
+        username: '2209722515-debug',
+        repo: 'time-schedule-data',
+        branch: 'main',
+        filename: 'data.json'
     },
     
     // 数据存储键名

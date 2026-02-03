@@ -3,21 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>时间管理系统 - 实时同步版</title>
+    <title>时间管理系统 - GitHub云端版</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
-        /* 移动端优化临时样式 */
-        @media (max-width: 768px) {
-            .mobile-optimized {
-                width: 100% !important;
-                overflow-x: auto !important;
-            }
-        }
-        
-        /* 网络状态指示器 */
-        .network-status {
+        /* GitHub状态指示器 */
+        .github-status {
             position: fixed;
             top: 10px;
             right: 10px;
@@ -25,24 +17,102 @@
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 12px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(36, 41, 46, 0.8);
             color: white;
             display: none;
         }
         
-        .network-status.online {
+        .github-status.online {
             background: rgba(46, 204, 113, 0.8);
         }
         
-        .network-status.offline {
+        .github-status.offline {
             background: rgba(231, 76, 60, 0.8);
+        }
+        
+        /* GitHub徽章 */
+        .github-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, #24292e 0%, #3b434d 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+        
+        /* 云端指示器 */
+        .cloud-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+        
+        .cloud-indicator:hover {
+            transform: scale(1.1);
+        }
+        
+        .cloud-indicator.syncing i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 简单的手风琴样式 */
+        .accordion {
+            margin-top: 15px;
+        }
+        
+        .accordion-item {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .accordion-content {
+            padding: 15px;
+            background: white;
+            display: none;
+        }
+        
+        .accordion-item.active .accordion-content {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- 网络状态指示器 -->
-    <div id="networkStatus" class="network-status">
-        <i class="fas fa-wifi"></i> 在线
+    <!-- GitHub状态指示器 -->
+    <div id="githubStatus" class="github-status">
+        <i class="fab fa-github"></i> <span>连接GitHub...</span>
     </div>
 
     <!-- 顶部导航 -->
@@ -51,8 +121,8 @@
             <div class="nav-brand">
                 <i class="fas fa-calendar-alt"></i>
                 <span>时间管理系统</span>
-                <span class="sync-badge" id="syncBadge" style="display:none;">
-                    <i class="fas fa-cloud"></i> 实时同步
+                <span class="github-badge" id="githubBadge">
+                    <i class="fab fa-github"></i> GitHub云端
                 </span>
             </div>
             <div class="nav-user" id="navUser">
@@ -66,8 +136,40 @@
         <!-- 系统状态提示 -->
         <div class="alert" id="systemAlert">
             <i class="fas fa-info-circle"></i>
-            <span id="alertMessage">访客模式：仅可查看时间安排</span>
-            <span id="syncStatusText" style="margin-left: auto; font-size: 12px;"></span>
+            <span id="alertMessage">正在从GitHub加载数据...</span>
+            <span id="syncInfo" style="margin-left: auto; font-size: 12px; opacity: 0.8;"></span>
+        </div>
+
+        <!-- 快速使用指南 -->
+        <div class="card quick-guide-card">
+            <div class="accordion">
+                <div class="accordion-item active">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span><i class="fas fa-rocket"></i> 快速开始</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="guide-steps">
+                            <div class="guide-step">
+                                <span class="step-number">1</span>
+                                <span class="step-text">任何人打开此页面即可查看时间安排</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">2</span>
+                                <span class="step-text">管理员登录可修改安排（账号: admin 密码: admin123）</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">3</span>
+                                <span class="step-text">数据自动保存到GitHub云端</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">4</span>
+                                <span class="step-text">所有设备实时同步更新</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 日期选择 -->
@@ -99,14 +201,9 @@
         <div class="card admin-card" id="adminCard" style="display:none;">
             <div class="admin-header">
                 <h3><i class="fas fa-user-cog"></i> 管理员设置</h3>
-                <div class="header-actions">
-                    <button class="btn btn-sm btn-outline" onclick="openSyncSettings()">
-                        <i class="fas fa-sync-alt"></i> 同步设置
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="openAdminSettings()">
-                        <i class="fas fa-cog"></i> 管理设置
-                    </button>
-                </div>
+                <button class="btn btn-sm btn-outline" onclick="openAdminSettings()">
+                    <i class="fas fa-cog"></i> 设置
+                </button>
             </div>
             
             <div class="time-setter">
@@ -134,9 +231,14 @@
                     </div>
                 </div>
                 
-                <button onclick="addSchedule()" class="btn btn-success btn-block">
-                    <i class="fas fa-plus"></i> 添加时间段
-                </button>
+                <div class="form-row">
+                    <button onclick="addSchedule()" class="btn btn-success">
+                        <i class="fas fa-plus"></i> 添加时间段
+                    </button>
+                    <button onclick="saveToGitHub()" class="btn btn-github" id="saveCloudBtn" style="display:none;">
+                        <i class="fab fa-github"></i> 保存到云端
+                    </button>
+                </div>
             </div>
             
             <!-- 快捷操作 -->
@@ -148,9 +250,15 @@
                     <i class="fas fa-upload"></i> 导入数据
                     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
                 </label>
-                <button onclick="forceSyncNow()" class="btn btn-info btn-sm" id="syncNowBtn">
+                <button onclick="forceSync()" class="btn btn-info btn-sm">
                     <i class="fas fa-sync"></i> 立即同步
                 </button>
+            </div>
+            
+            <!-- GitHub状态信息 -->
+            <div class="github-info" id="githubInfo" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: var(--radius); font-size: 12px; display: none;">
+                <i class="fab fa-github"></i>
+                <span>数据已连接到GitHub仓库：<a href="https://github.com/2209722515-debug/time-schedule-data" target="_blank">2209722515-debug/time-schedule-data</a></span>
             </div>
         </div>
 
@@ -161,7 +269,7 @@
                 <div class="stats-badge">
                     <span class="badge free-badge" id="freeCount">0</span> 空闲
                     <span class="badge busy-badge" id="busyCount">0</span> 繁忙
-                    <span class="badge sync-badge" id="onlineCount" title="在线设备数">0</span> 在线
+                    <span class="badge cloud-badge" id="cloudCount" title="云端数据条数">0</span> 云端
                 </div>
             </div>
             
@@ -189,6 +297,13 @@
                     <p class="empty-tip">管理员登录后可添加时间安排</p>
                 </div>
             </div>
+            
+            <!-- 数据来源提示 -->
+            <div class="data-source" style="margin-top: 15px; text-align: center; font-size: 12px; color: var(--gray-color);">
+                <i class="fab fa-github"></i> 数据来源：GitHub云端存储 | 
+                <span id="lastSyncTime">从未同步</span> |
+                <a href="javascript:void(0)" onclick="forceSync()" style="color: var(--primary-color);">手动刷新</a>
+            </div>
         </div>
 
         <!-- 说明卡片 -->
@@ -200,23 +315,46 @@
                     <div>
                         <h4>普通成员</h4>
                         <p>直接查看时间安排，无需登录</p>
+                        <p class="help-tip">数据来自GitHub云端，自动更新</p>
                     </div>
                 </div>
                 <div class="help-item">
                     <i class="fas fa-user-shield"></i>
                     <div>
                         <h4>管理员</h4>
-                        <p>点击右上角登录，可设置时间安排</p>
+                        <p>登录账号可管理时间安排</p>
+                        <p class="help-tip">账号：admin 密码：admin123</p>
                     </div>
                 </div>
                 <div class="help-item">
-                    <i class="fas fa-sync-alt"></i>
+                    <i class="fab fa-github"></i>
                     <div>
-                        <h4>实时同步</h4>
-                        <p>• 启用后所有设备实时同步</p>
-                        <p>• 支持离线使用</p>
-                        <p>• 自动冲突解决</p>
+                        <h4>云端同步</h4>
+                        <p>• 数据存储在GitHub</p>
+                        <p>• 自动实时同步</p>
+                        <p>• 支持离线查看</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub仓库信息 -->
+        <div class="card github-card">
+            <h3><i class="fab fa-github"></i> GitHub数据仓库</h3>
+            <div class="github-info-content">
+                <p>您的数据存储在以下GitHub仓库中：</p>
+                <div class="repo-info">
+                    <h4><a href="https://github.com/2209722515-debug/time-schedule-data" target="_blank">2209722515-debug/time-schedule-data</a></h4>
+                    <p>数据文件：<code>data.json</code></p>
+                    <p>公开访问：<a href="https://raw.githubusercontent.com/2209722515-debug/time-schedule-data/main/data.json" target="_blank">查看原始数据</a></p>
+                </div>
+                <div class="github-actions">
+                    <button onclick="openGitHubRepo()" class="btn btn-sm btn-outline">
+                        <i class="fab fa-github"></i> 打开仓库
+                    </button>
+                    <button onclick="showGitHubHelp()" class="btn btn-sm btn-outline">
+                        <i class="fas fa-question-circle"></i> 配置帮助
+                    </button>
                 </div>
             </div>
         </div>
@@ -234,13 +372,17 @@
                     <label for="loginUsername">
                         <i class="fas fa-user"></i> 管理员账号
                     </label>
-                    <input type="text" id="loginUsername" placeholder="输入账号" autocomplete="username">
+                    <input type="text" id="loginUsername" placeholder="输入账号" autocomplete="username" value="admin">
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">
                         <i class="fas fa-lock"></i> 密码
                     </label>
-                    <input type="password" id="loginPassword" placeholder="输入密码" autocomplete="current-password">
+                    <input type="password" id="loginPassword" placeholder="输入密码" autocomplete="current-password" value="admin123">
+                </div>
+                <div class="login-tips">
+                    <p><i class="fas fa-info-circle"></i> 默认账号：admin / admin123</p>
+                    <p><i class="fab fa-github"></i> 登录后可保存数据到GitHub云端</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -248,149 +390,6 @@
                 <button class="btn btn-primary" onclick="performLogin()">
                     <i class="fas fa-sign-in-alt"></i> 登录
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 同步设置模态框 -->
-    <div class="modal" id="syncSettingsModal">
-        <div class="modal-dialog wide">
-            <div class="modal-header">
-                <h3><i class="fas fa-sync-alt"></i> 实时同步设置</h3>
-                <button class="close-btn" onclick="hideSyncSettings()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- 同步状态 -->
-                <div class="sync-status-section">
-                    <h4><i class="fas fa-cloud"></i> 同步状态</h4>
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <span class="status-label">网络状态：</span>
-                            <span id="syncNetworkStatus" class="status-value online">
-                                <i class="fas fa-wifi"></i> 在线
-                            </span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">同步状态：</span>
-                            <span id="syncActiveStatus" class="status-value inactive">
-                                <i class="fas fa-pause-circle"></i> 未启用
-                            </span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">最后同步：</span>
-                            <span id="syncLastTime" class="status-value">从未同步</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">在线设备：</span>
-                            <span id="syncDeviceCount" class="status-value">1</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 同步控制 -->
-                <div class="sync-control-section">
-                    <h4><i class="fas fa-cogs"></i> 同步控制</h4>
-                    <div class="sync-toggle-group">
-                        <div class="toggle-item">
-                            <span class="toggle-label">启用实时同步</span>
-                            <label class="switch">
-                                <input type="checkbox" id="syncToggle" onchange="toggleAutoSync()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="toggle-item">
-                            <span class="toggle-label">自动冲突解决</span>
-                            <label class="switch">
-                                <input type="checkbox" id="autoResolveToggle" checked onchange="toggleAutoResolve()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="sync-actions">
-                        <button onclick="shareTeamSync()" class="btn btn-primary">
-                            <i class="fas fa-share-alt"></i> 分享同步链接
-                        </button>
-                        <button onclick="forceSyncNow()" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> 立即同步
-                        </button>
-                        <button onclick="resetSync()" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> 重置同步
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 同步信息 -->
-                <div class="sync-info-section">
-                    <h4><i class="fas fa-info-circle"></i> 同步信息</h4>
-                    <div class="sync-info">
-                        <div class="info-item">
-                            <span class="info-label">同步密钥：</span>
-                            <code id="syncKeyDisplay" class="sync-key">未生成</code>
-                            <button onclick="copySyncKey()" class="btn btn-sm btn-outline">
-                                <i class="far fa-copy"></i> 复制
-                            </button>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">设备ID：</span>
-                            <span id="deviceIdDisplay" class="info-value">未知</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">数据版本：</span>
-                            <span id="dataVersionDisplay" class="info-value">v1.0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 云同步设置 -->
-                <div class="cloud-sync-section">
-                    <h4><i class="fas fa-cloud-upload-alt"></i> 云备份设置</h4>
-                    <div class="form-group">
-                        <label>GitHub Token（可选）：</label>
-                        <input type="password" id="githubToken" placeholder="输入GitHub Token用于云备份" class="form-control">
-                        <small class="form-text">
-                            <a href="https://github.com/settings/tokens" target="_blank">获取Token</a>
-                            （需要gist权限，用于跨浏览器同步）
-                        </small>
-                    </div>
-                    <div class="cloud-actions">
-                        <button onclick="setupGitHubSync()" class="btn btn-primary btn-sm">
-                            <i class="fas fa-key"></i> 设置Token
-                        </button>
-                        <button onclick="backupToCloud()" class="btn btn-success btn-sm">
-                            <i class="fas fa-cloud-upload-alt"></i> 备份到云端
-                        </button>
-                        <button onclick="restoreFromCloud()" class="btn btn-info btn-sm">
-                            <i class="fas fa-cloud-download-alt"></i> 从云端恢复
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 帮助信息 -->
-                <div class="sync-help-section">
-                    <h4><i class="fas fa-question-circle"></i> 使用帮助</h4>
-                    <div class="help-content">
-                        <div class="help-step">
-                            <h5><span class="step-number">1</span> 启用同步</h5>
-                            <p>开启"启用实时同步"开关，系统会自动生成同步密钥。</p>
-                        </div>
-                        <div class="help-step">
-                            <h5><span class="step-number">2</span> 分享链接</h5>
-                            <p>点击"分享同步链接"，将生成的链接发送给团队成员。</p>
-                        </div>
-                        <div class="help-step">
-                            <h5><span class="step-number">3</span> 加入同步</h5>
-                            <p>团队成员打开分享的链接，即可自动加入同步组。</p>
-                        </div>
-                        <div class="help-step">
-                            <h5><span class="step-number">4</span> 实时同步</h5>
-                            <p>所有设备将自动保持同步，任何修改都会实时更新。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="hideSyncSettings()">关闭</button>
             </div>
         </div>
     </div>
@@ -403,6 +402,51 @@
                 <button class="close-btn" onclick="hideAdminSettings()">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- GitHub配置 -->
+                <div class="github-config-section">
+                    <h4><i class="fab fa-github"></i> GitHub配置</h4>
+                    <div class="config-info">
+                        <p>当前配置：</p>
+                        <ul>
+                            <li>用户名：<code>2209722515-debug</code></li>
+                            <li>仓库：<code>time-schedule-data</code></li>
+                            <li>文件：<code>data.json</code></li>
+                            <li>分支：<code>main</code></li>
+                        </ul>
+                        <p>如需修改配置，请编辑script.js文件中的CONFIG对象</p>
+                    </div>
+                    
+                    <div class="token-setting">
+                        <h5>GitHub Token设置</h5>
+                        <p>保存数据到GitHub需要Token：</p>
+                        <div class="form-group">
+                            <input type="password" id="githubTokenInput" placeholder="输入GitHub Token" style="width: 100%; padding: 8px;">
+                        </div>
+                        <button onclick="saveGitHubToken()" class="btn btn-sm btn-primary">
+                            <i class="fas fa-save"></i> 保存Token
+                        </button>
+                        <button onclick="clearGitHubToken()" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-trash"></i> 清除Token
+                        </button>
+                        <p class="help-text">
+                            <a href="https://github.com/settings/tokens" target="_blank">如何获取GitHub Token？</a>
+                            （需要repo权限）
+                        </p>
+                    </div>
+                    
+                    <div class="github-actions">
+                        <button onclick="testGitHubConnection()" class="btn btn-sm btn-info">
+                            <i class="fas fa-plug"></i> 测试连接
+                        </button>
+                        <button onclick="forceSaveToGitHub()" class="btn btn-sm btn-success">
+                            <i class="fas fa-cloud-upload-alt"></i> 强制保存
+                        </button>
+                        <button onclick="showRawData()" class="btn btn-sm btn-outline">
+                            <i class="fas fa-code"></i> 查看原始数据
+                        </button>
+                    </div>
+                </div>
+
                 <!-- 当前管理员信息 -->
                 <div class="current-admin-info">
                     <h4>当前账号信息</h4>
@@ -441,28 +485,6 @@
                     </div>
                 </div>
 
-                <!-- 添加新管理员 -->
-                <div class="add-admin-form">
-                    <h4>添加新管理员</h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>账号：</label>
-                            <input type="text" id="newAdminUsername" placeholder="输入账号">
-                        </div>
-                        <div class="form-group">
-                            <label>密码：</label>
-                            <input type="password" id="newAdminPassword" placeholder="输入密码">
-                        </div>
-                        <div class="form-group">
-                            <label>昵称：</label>
-                            <input type="text" id="newAdminName" placeholder="输入昵称">
-                        </div>
-                        <button onclick="addNewAdmin()" class="btn btn-success">
-                            <i class="fas fa-plus"></i> 添加
-                        </button>
-                    </div>
-                </div>
-
                 <!-- 现有管理员列表 -->
                 <div class="admin-list">
                     <h4>管理员列表</h4>
@@ -472,7 +494,6 @@
                                 <tr>
                                     <th>账号</th>
                                     <th>昵称</th>
-                                    <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody id="adminList">
@@ -488,46 +509,73 @@
         </div>
     </div>
 
-    <!-- 冲突解决模态框 -->
-    <div class="modal" id="conflictModal" style="display:none;">
-        <div class="modal-dialog">
+    <!-- GitHub帮助模态框 -->
+    <div class="modal" id="githubHelpModal" style="display:none;">
+        <div class="modal-dialog wide">
             <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle text-warning"></i> 数据冲突</h3>
-                <button class="close-btn" onclick="hideConflictModal()">&times;</button>
+                <h3><i class="fab fa-github"></i> GitHub配置帮助</h3>
+                <button class="close-btn" onclick="hideGitHubHelp()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>发现数据冲突，请选择如何处理：</p>
-                <div class="conflict-options">
-                    <div class="conflict-option">
-                        <input type="radio" id="resolveKeepLocal" name="resolveOption" value="local" checked>
-                        <label for="resolveKeepLocal">
-                            <strong>保留本地数据</strong>
-                            <small>丢弃云端更改，使用本地版本</small>
-                        </label>
+                <div class="help-steps">
+                    <div class="step">
+                        <h4>步骤1：创建GitHub仓库</h4>
+                        <p>访问 <a href="https://github.com/new" target="_blank">github.com/new</a></p>
+                        <ul>
+                            <li>仓库名：<code>time-schedule-data</code></li>
+                            <li>设置为公开（Public）</li>
+                            <li>初始化README</li>
+                        </ul>
                     </div>
-                    <div class="conflict-option">
-                        <input type="radio" id="resolveKeepCloud" name="resolveOption" value="cloud">
-                        <label for="resolveKeepCloud">
-                            <strong>使用云端数据</strong>
-                            <small>覆盖本地更改，使用云端版本</small>
-                        </label>
+                    
+                    <div class="step">
+                        <h4>步骤2：创建data.json文件</h4>
+                        <p>在仓库中创建 <code>data.json</code> 文件：</p>
+                        <pre><code>{
+  "schedules": [],
+  "adminUsers": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "name": "系统管理员"
+    }
+  ],
+  "lastUpdated": "2024-01-01T00:00:00.000Z"
+}</code></pre>
                     </div>
-                    <div class="conflict-option">
-                        <input type="radio" id="resolveMerge" name="resolveOption" value="merge">
-                        <label for="resolveMerge">
-                            <strong>智能合并</strong>
-                            <small>自动合并冲突，保留最新更改</small>
-                        </label>
+                    
+                    <div class="step">
+                        <h4>步骤3：获取GitHub Token</h4>
+                        <p>访问 <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></p>
+                        <ul>
+                            <li>点击 "Generate new token"</li>
+                            <li>选择 "classic" token</li>
+                            <li>勾选 <strong>repo</strong> 权限</li>
+                            <li>复制生成的Token</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step">
+                        <h4>步骤4：配置系统</h4>
+                        <p>在本系统的管理员设置中：</p>
+                        <ol>
+                            <li>粘贴GitHub Token</li>
+                            <li>测试连接</li>
+                            <li>开始使用</li>
+                        </ol>
                     </div>
                 </div>
-                <div class="conflict-preview">
-                    <h5>冲突预览：</h5>
-                    <div id="conflictPreview"></div>
+                
+                <div class="current-config">
+                    <h4>您的当前配置</h4>
+                    <pre><code id="currentConfig">正在加载配置...</code></pre>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="hideConflictModal()">取消</button>
-                <button class="btn btn-primary" onclick="resolveConflict()">确定</button>
+                <button class="btn btn-primary" onclick="openGitHubRepo()">
+                    <i class="fab fa-github"></i> 打开我的仓库
+                </button>
+                <button class="btn btn-secondary" onclick="hideGitHubHelp()">关闭</button>
             </div>
         </div>
     </div>
@@ -535,17 +583,67 @@
     <!-- 脚注 -->
     <footer class="footer">
         <div class="container">
-            <p>时间管理系统 v2.0 &copy; 2024 | 实时同步版 | <span id="footerSyncStatus">同步已禁用</span></p>
+            <p>时间管理系统 v3.0 &copy; 2024 | GitHub云端版 | 
+                <span id="footerStatus">正在连接GitHub...</span> | 
+                <a href="javascript:void(0)" onclick="showSystemInfo()" style="color: #ddd;">系统信息</a>
+            </p>
         </div>
     </footer>
 
-    <!-- 同步指示器 -->
-    <div id="syncIndicator" class="sync-indicator" title="点击手动同步" onclick="forceSyncNow()">
-        <i class="fas fa-cloud-slash"></i>
+    <!-- 云端指示器 -->
+    <div id="cloudIndicator" class="cloud-indicator" title="点击手动同步" onclick="forceSync()">
+        <i class="fas fa-cloud"></i>
     </div>
 
     <!-- 脚本引入 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // 手风琴功能
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            // 关闭所有
+            document.querySelectorAll('.accordion-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 如果当前不是活动的，则打开
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        }
+        
+        // 系统信息
+        function showSystemInfo() {
+            const info = `
+时间管理系统 - GitHub云端版
+版本：v3.0
+GitHub用户：2209722515-debug
+仓库：time-schedule-data
+数据文件：data.json
+时间安排数：${window.schedules ? window.schedules.length : 0}
+最后同步：${localStorage.getItem('last_github_sync_time') || '从未同步'}
+            `;
+            alert(info);
+        }
+        
+        // 打开GitHub仓库
+        function openGitHubRepo() {
+            window.open('https://github.com/2209722515-debug/time-schedule-data', '_blank');
+        }
+        
+        // 显示GitHub帮助
+        function showGitHubHelp() {
+            document.getElementById('githubHelpModal').style.display = 'flex';
+            document.getElementById('currentConfig').textContent = JSON.stringify(window.CONFIG, null, 2);
+        }
+        
+        // 隐藏GitHub帮助
+        function hideGitHubHelp() {
+            document.getElementById('githubHelpModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
