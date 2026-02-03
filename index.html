@@ -557,16 +557,15 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="hideGitHubTokenModal()">取消</button>
-                <button class="btn btn-success" onclick="testGitHubTokenInput()">
-                    <i class="fas fa-vial"></i> 测试Token
-                </button>
-                <button class="btn btn-primary" onclick="saveGitHubToken()">
-                    <i class="fas fa-save"></i> 保存Token
-                </button>
-            </div>
-        </div>
+        <button class="btn btn-secondary" onclick="hideGitHubTokenModal()">取消</button>
+        <button class="btn btn-success" onclick="testGitHubTokenInput()" id="testTokenBtn">
+            <i class="fas fa-vial"></i> 测试Token
+        </button>
+        <button class="btn btn-primary" onclick="saveGitHubToken()" id="saveTokenBtn">
+            <i class="fas fa-save"></i> 保存Token
+        </button>
     </div>
+</div>
 
     <!-- 管理员设置模态框 -->
     <div class="modal" id="adminSettingsModal">

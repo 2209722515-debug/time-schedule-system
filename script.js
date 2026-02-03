@@ -380,7 +380,86 @@ async function testGitHubToken() {
     }
 }
 
-// 移除GitHub Token
+// 使用指定Token测试GitHub API
+async function testGitHubTokenWithToken(token) {
+    try {
+        // 先显示测试中的消息
+        showMessage('正在连接GitHub API...', 'info');
+        
+        const response = await fetch(CONFIG.github.apiUrl, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        
+        if (response.ok) {
+            console.log('GitHub Token验证成功');
+            return true;
+        } else {
+            const error = await response.json();
+            console.error('GitHub Token验证失败:', error);
+            
+            let errorMessage = 'Token验证失败: ';
+            if (response.status === 401) {
+                errorMessage += 'Token无效或已过期';
+            } else if (response.status === 403) {
+                errorMessage += '权限不足（需要repo权限）';
+            } else if (response.status === 404) {
+                errorMessage += '仓库不存在或无法访问';
+            } else {
+                errorMessage += error.message || `HTTP ${response.status}`;
+            }
+            
+            showMessage(errorMessage, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('测试GitHub Token时出错:', error);
+        showMessage('Token测试失败: 网络错误或无法连接到GitHub', 'error');
+        return false;
+    }
+}
+
+// 测试输入的GitHub Token（在Token配置模态框中）
+async function testGitHubTokenInput() {
+    const tokenInput = document.getElementById('githubTokenInput');
+    if (!tokenInput) {
+        showMessage('找不到Token输入框', 'error');
+        return;
+    }
+    
+    const token = tokenInput.value.trim();
+    
+    if (!token) {
+        showMessage('请输入GitHub Token', 'warning');
+        tokenInput.focus();
+        return;
+    }
+    
+    // 验证Token格式
+    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+        showMessage('Token格式不正确，请确保是有效的GitHub Token', 'warning');
+        tokenInput.focus();
+        tokenInput.select();
+        return;
+    }
+    
+    showMessage('正在测试Token...', 'info');
+    
+    const isValid = await testGitHubTokenWithToken(token);
+    if (isValid) {
+        showMessage('✅ Token验证成功！可以正常访问GitHub仓库', 'success');
+        tokenInput.style.borderColor = '#2ecc71';
+        tokenInput.style.borderWidth = '2px';
+        
+        // 3秒后恢复边框样式
+        setTimeout(() => {
+            tokenInput.style.borderColor = '';
+            tokenInput.style.borderWidth = '';
+        }, 3000);
+    }
+}// 移除GitHub Token
 function removeGitHubToken() {
     const confirmed = confirm('确定要移除GitHub Token吗？移除后将无法上传数据到云端。');
     
