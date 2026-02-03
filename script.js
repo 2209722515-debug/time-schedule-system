@@ -2374,3 +2374,50 @@ window.addEventListener('load', function() {
 console.log('时间管理系统初始化完成，版本：GitHub云同步版 v2.0（所有管理员均可配置Token）');
 console.log('GitHub仓库：', CONFIG.github.rawUrl);
 console.log('Token状态：', githubToken ? '已配置' : '未配置');
+// 强制绑定所有按钮事件（确保在最后执行）
+(function bindAllButtons() {
+    console.log('开始绑定所有按钮事件...');
+    
+    // 绑定所有测试Token按钮
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('button');
+        if (!button) return;
+        
+        const buttonText = button.textContent || '';
+        const buttonId = button.id || '';
+        
+        // 测试Token按钮
+        if (buttonText.includes('测试Token') || buttonId.includes('testToken')) {
+            console.log('点击了测试Token按钮');
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // 判断是在哪个模态框
+            if (document.getElementById('githubTokenModal')?.style.display === 'flex') {
+                // 在Token配置模态框中
+                testGitHubTokenInput();
+            } else {
+                // 在同步设置中
+                testGitHubToken();
+            }
+        }
+        
+        // 保存Token按钮
+        if (buttonText.includes('保存Token') || buttonId.includes('saveToken')) {
+            console.log('点击了保存Token按钮');
+            event.preventDefault();
+            event.stopPropagation();
+            saveGitHubToken();
+        }
+        
+        // 配置Token按钮
+        if (buttonText.includes('配置Token') || buttonText.includes('配置GitHub')) {
+            console.log('点击了配置Token按钮');
+            event.preventDefault();
+            event.stopPropagation();
+            configureGitHubToken();
+        }
+    });
+    
+    console.log('按钮事件绑定完成');
+})();
