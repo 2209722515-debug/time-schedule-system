@@ -407,7 +407,7 @@ input[type="date"]:focus {
     text-decoration: underline;
 }
 
-/* 时间表 */
+/* 时间表 - 主要优化部分 */
 .schedule-card .card-header {
     display: flex;
     justify-content: space-between;
@@ -446,10 +446,14 @@ input[type="date"]:focus {
     cursor: default;
 }
 
+/* 表格容器优化 */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch; /* 手机平滑滚动 */
     position: relative;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
 }
 
 .scroll-hint {
@@ -474,6 +478,7 @@ input[type="date"]:focus {
     100% { opacity: 0.7; }
 }
 
+/* 表格主体优化 */
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
@@ -488,61 +493,115 @@ input[type="date"]:focus {
     color: var(--dark-color);
     border-bottom: 2px solid var(--border-color);
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
 }
 
 .schedule-table td {
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
 }
 
 .schedule-table tr:hover {
     background: #f8f9fa;
 }
 
+/* 移动端表格列宽优化 */
 .col-time {
-    width: 25%;
-    min-width: 150px;
+    width: 28%;
+    min-width: 180px;
+    position: relative;
 }
 
 .col-status {
-    width: 15%;
-    min-width: 80px;
+    width: 17%;
+    min-width: 90px;
 }
 
 .col-admin {
     width: 25%;
-    min-width: 120px;
+    min-width: 130px;
 }
 
 .col-actions {
-    width: 35%;
-    min-width: 100px;
+    width: 30%;
+    min-width: 140px;
 }
 
-.status-cell {
+/* 时间段显示优化 - 核心改进 */
+.time-period-cell {
+    font-weight: 600;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.time-period-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.time-period-range {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.time-period-duration {
+    font-size: 12px;
+    color: var(--gray-color);
+    background: rgba(52, 152, 219, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 2px;
+}
+
+/* 状态显示优化 */
+.status-cell {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
     text-align: center;
     width: fit-content;
     display: inline-block;
+    min-width: 70px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
 }
 
 .status-free {
-    background: rgba(46, 204, 113, 0.1);
-    color: var(--secondary-color);
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
 .status-busy {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--danger-color);
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
+/* 管理员信息显示优化 */
 .admin-cell {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 0;
 }
 
 .admin-avatar {
@@ -552,10 +611,25 @@ input[type="date"]:focus {
     object-fit: cover;
 }
 
+.admin-name {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* 操作按钮优化 */
 .action-buttons {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.action-btn {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
 }
 
 .empty-state {
@@ -1223,43 +1297,96 @@ input:checked + .slider:before {
         font-size: 0.9em;
     }
     
-    /* 表格响应式设计 */
+    /* 表格响应式设计 - 主要优化 */
     .table-responsive {
-        margin: 0 -15px;
-        padding: 0 15px;
-        width: calc(100% + 30px);
+        margin: 0;
+        padding: 0;
+        width: 100%;
         border: 1px solid var(--border-color);
         border-radius: var(--radius);
         background: white;
+        overflow-x: auto;
     }
     
     .schedule-table {
         min-width: 600px;
-    }
-    
-    .schedule-table th,
-    .schedule-table td {
-        padding: 12px 10px;
         font-size: 13px;
     }
     
+    .schedule-table th {
+        padding: 12px 10px;
+        font-size: 12px;
+        background: var(--light-color);
+        position: sticky;
+        left: 0;
+        top: 0;
+    }
+    
+    .schedule-table td {
+        padding: 12px 10px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 移动端列宽优化 */
     .col-time { 
         width: 30%;
-        min-width: 180px;
+        min-width: 160px;
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 2;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     }
+    
     .col-status { 
         width: 20%;
-        min-width: 100px;
+        min-width: 90px;
     }
+    
     .col-admin { 
         width: 25%;
-        min-width: 140px;
+        min-width: 120px;
     }
+    
     .col-actions { 
         width: 25%;
         min-width: 120px;
     }
     
+    /* 时间段显示优化（移动端） */
+    .time-period-cell {
+        padding: 10px 5px;
+    }
+    
+    .time-period-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .time-period-range {
+        min-width: 100px;
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 15px;
+    }
+    
+    .time-period-duration {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+    
+    /* 状态显示优化（移动端） */
+    .status-cell {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 60px;
+        border-radius: 15px;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    }
+    
+    /* 操作按钮优化 */
     .action-buttons {
         flex-direction: column;
         gap: 8px;
@@ -1269,16 +1396,14 @@ input:checked + .slider:before {
         width: 100%;
         padding: 8px 10px;
         font-size: 12px;
-    }
-    
-    .status-cell {
-        padding: 4px 8px;
-        font-size: 11px;
+        min-height: 36px;
     }
     
     .scroll-hint {
         font-size: 10px;
         padding: 4px 8px;
+        top: 5px;
+        right: 5px;
     }
     
     /* 空状态优化 */
@@ -1547,7 +1672,7 @@ input:checked + .slider:before {
         font-size: 12px;
     }
     
-    /* 表格 */
+    /* 表格 - 进一步优化 */
     .schedule-table {
         min-width: 550px;
     }
@@ -1556,6 +1681,42 @@ input:checked + .slider:before {
     .schedule-table td {
         padding: 10px 8px;
         font-size: 12px;
+    }
+    
+    .col-time { 
+        min-width: 150px;
+        padding: 10px 8px;
+    }
+    
+    .col-status { 
+        min-width: 80px;
+    }
+    
+    .col-admin { 
+        min-width: 110px;
+    }
+    
+    .col-actions { 
+        min-width: 110px;
+    }
+    
+    /* 时间段显示优化（小屏幕） */
+    .time-period-range {
+        min-width: 90px;
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .time-period-duration {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+    
+    /* 状态显示优化 */
+    .status-cell {
+        padding: 5px 8px;
+        font-size: 11px;
+        min-width: 55px;
     }
     
     /* 按钮调整 */
@@ -1642,14 +1803,28 @@ input:checked + .slider:before {
         font-size: 11px;
     }
     
-    .col-time { min-width: 150px; }
-    .col-status { min-width: 80px; }
-    .col-admin { min-width: 120px; }
+    .col-time { min-width: 140px; }
+    .col-status { min-width: 70px; }
+    .col-admin { min-width: 100px; }
     .col-actions { min-width: 100px; }
     
+    /* 时间段显示（超小屏幕） */
+    .time-period-range {
+        min-width: 80px;
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+    
+    .time-period-duration {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    /* 状态显示 */
     .status-cell {
         font-size: 10px;
-        padding: 3px 6px;
+        padding: 4px 6px;
+        min-width: 50px;
     }
     
     /* 统计徽章 */
@@ -1729,12 +1904,29 @@ input:checked + .slider:before {
     .sync-indicator {
         min-height: 44px;
     }
+    
+    /* 改善触摸滚动体验 */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* 改善深色模式下的触摸反馈 */
+    .schedule-table tr:active {
+        background: rgba(52, 152, 219, 0.1);
+    }
 }
 
-/* 深色模式支持 */
+/* ======================
+   深色模式优化 - 重点改进
+   ====================== */
 @media (prefers-color-scheme: dark) {
     :root {
-        --dark-color: #f8f9fa;
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --dark-color: #e9ecef;
         --light-color: #343a40;
         --border-color: #495057;
         --shadow: 0 2px 12px rgba(0,0,0,0.3);
@@ -1743,13 +1935,14 @@ input:checked + .slider:before {
     }
     
     body {
-        background: #212529;
-        color: #f8f9fa;
+        background: #121212;
+        color: #e9ecef;
     }
     
     .card {
-        background: #343a40;
-        color: #f8f9fa;
+        background: #1e1e1e;
+        color: #e9ecef;
+        border: 1px solid #333;
     }
     
     .github-config-alert {
@@ -1770,16 +1963,81 @@ input:checked + .slider:before {
     }
     
     .time-setter {
-        background: #495057;
+        background: #2d2d2d;
     }
     
     .schedule-table tr:hover {
-        background: #495057;
+        background: #2d2d2d;
     }
     
+    /* 表格优化 - 深色模式 */
+    .schedule-table th {
+        background: #2d2d2d;
+        color: #e9ecef;
+        border-bottom-color: #444;
+    }
+    
+    .schedule-table td {
+        border-bottom-color: #444;
+        color: #e9ecef;
+    }
+    
+    /* 时间段显示优化 - 深色模式 */
+    .time-period-range {
+        background: linear-gradient(135deg, #2980b9 0%, #1c5d87 100%);
+        color: white;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+    
+    .time-period-duration {
+        color: #b0bec5;
+        background: rgba(52, 152, 219, 0.15);
+    }
+    
+    /* 状态显示优化 - 深色模式 */
+    .status-free {
+        background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+        color: white;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+    
+    .status-busy {
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+        color: white;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+    
+    /* 固定列的阴影优化 */
+    .col-time {
+        background: #1e1e1e;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+    }
+    
+    /* 表格滚动条优化 */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: #2d2d2d;
+        border-radius: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #495057;
+        border-radius: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #6c757d;
+    }
+    
+    /* 模态框 */
     .modal-dialog {
-        background: #343a40;
-        color: #f8f9fa;
+        background: #1e1e1e;
+        color: #e9ecef;
+        border: 1px solid #333;
     }
     
     .modal-header {
@@ -1792,9 +2050,9 @@ input:checked + .slider:before {
     input[type="date"],
     .info-input,
     .form-control {
-        background: #495057;
-        border-color: #6c757d;
-        color: #f8f9fa;
+        background: #2d2d2d;
+        border-color: #444;
+        color: #e9ecef;
     }
     
     .time-input:focus,
@@ -1804,6 +2062,7 @@ input:checked + .slider:before {
     .info-input:focus,
     .form-control:focus {
         border-color: #3498db;
+        background: #333;
     }
     
     .form-group label,
@@ -1816,25 +2075,28 @@ input:checked + .slider:before {
     .status-item,
     .toggle-item,
     .help-step {
-        background: #2d3748;
+        background: #2d2d2d;
     }
     
     .sync-key {
-        background: #4a5568;
+        background: #333;
         color: #e2e8f0;
     }
     
     .sync-indicator {
         background: #2d3748;
         color: #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
     }
     
     .badge.free-badge {
         background: rgba(46, 204, 113, 0.3);
+        color: #2ecc71;
     }
     
     .badge.busy-badge {
         background: rgba(231, 76, 60, 0.3);
+        color: #e74c3c;
     }
     
     .badge.sync-badge {
@@ -1844,32 +2106,65 @@ input:checked + .slider:before {
     
     .footer {
         background: #0d1117;
+        border-top: 1px solid #333;
     }
     
     .footer a {
         color: #58a6ff;
     }
+    
+    /* 深色模式下的空状态 */
+    .empty-state {
+        color: #adb5bd;
+    }
+    
+    .empty-state i {
+        color: #6c757d;
+    }
+    
+    .empty-tip {
+        color: #6c757d;
+    }
+    
+    /* 深色模式下的按钮 */
+    .btn-secondary {
+        background: #495057;
+        color: #e9ecef;
+    }
+    
+    .btn-secondary:hover {
+        background: #6c757d;
+    }
+    
+    .btn-outline {
+        border-color: #3498db;
+        color: #3498db;
+    }
+    
+    .btn-outline:hover {
+        background: #3498db;
+        color: white;
+    }
 }
 
-/* 滚动条样式优化 */
-@media (max-width: 768px) {
-    .table-responsive::-webkit-scrollbar {
-        height: 6px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
+/* 滚动条样式优化 - 所有模式 */
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* 打印样式 */
@@ -1905,6 +2200,7 @@ input:checked + .slider:before {
         color: #000 !important;
     }
 }
+
 /* Token状态指示器 */
 .token-status-indicator {
     display: inline-flex;
@@ -1947,5 +2243,75 @@ input:checked + .slider:before {
 @media (max-width: 576px) {
     .token-status-indicator {
         display: none; /* 在小屏幕上隐藏 */
+    }
+}
+
+/* ======================
+   新增：移动端触摸优化
+   ====================== */
+
+/* 触摸设备专用优化 */
+.touch-device .schedule-table td {
+    padding: 14px 12px;
+}
+
+.touch-device .action-buttons .btn {
+    min-height: 44px;
+    padding: 10px 15px;
+}
+
+.touch-device .status-cell {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+/* iOS Safari 特定优化 */
+@supports (-webkit-touch-callout: none) {
+    .schedule-table {
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    .time-period-range {
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+}
+
+/* Android Chrome 特定优化 */
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+    .schedule-table {
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .time-period-range {
+        border: 2px solid currentColor;
+    }
+    
+    .status-cell {
+        border: 2px solid currentColor;
+    }
+    
+    .schedule-table th {
+        border-bottom: 3px solid currentColor;
+    }
+}
+
+/* 减少动画（为晕动症用户） */
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .status-btn,
+    .sync-indicator {
+        transition: none;
+    }
+    
+    .scroll-hint {
+        animation: none;
+    }
+    
+    .sync-indicator.syncing i {
+        animation: none;
     }
 }
