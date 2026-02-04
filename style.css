@@ -1,3 +1,5 @@
+[file name]: style.css
+[file content begin]
 /* 基础样式 */
 :root {
     --primary-color: #3498db;
@@ -493,6 +495,7 @@ input[type="date"]:focus {
 .schedule-table td {
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
 }
 
 .schedule-table tr:hover {
@@ -1223,7 +1226,7 @@ input:checked + .slider:before {
         font-size: 0.9em;
     }
     
-    /* 表格响应式设计 */
+    /* 表格响应式设计 - 增强修复 */
     .table-responsive {
         margin: 0 -15px;
         padding: 0 15px;
@@ -1234,30 +1237,44 @@ input:checked + .slider:before {
     }
     
     .schedule-table {
-        min-width: 600px;
+        min-width: 100% !important;
+        table-layout: fixed !important;
     }
     
     .schedule-table th,
     .schedule-table td {
-        padding: 12px 10px;
-        font-size: 13px;
+        padding: 12px 8px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
+    .schedule-table th {
+        padding: 12px 8px;
+        font-size: 11px;
+    }
+    
+    /* 列宽优化 */
     .col-time { 
-        width: 30%;
-        min-width: 180px;
+        width: 30% !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
     }
     .col-status { 
-        width: 20%;
-        min-width: 100px;
+        width: 20% !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
     }
     .col-admin { 
-        width: 25%;
-        min-width: 140px;
+        width: 25% !important;
+        min-width: 90px !important;
+        max-width: 90px !important;
     }
     .col-actions { 
-        width: 25%;
-        min-width: 120px;
+        width: 25% !important;
+        min-width: 100px !important;
+        max-width: 100px !important;
     }
     
     .action-buttons {
@@ -1267,13 +1284,15 @@ input:checked + .slider:before {
     
     .action-buttons .btn {
         width: 100%;
-        padding: 8px 10px;
-        font-size: 12px;
+        padding: 8px 6px;
+        font-size: 11px;
+        min-height: 36px;
     }
     
     .status-cell {
         padding: 4px 8px;
-        font-size: 11px;
+        font-size: 10px;
+        min-width: 50px;
     }
     
     .scroll-hint {
@@ -1547,15 +1566,36 @@ input:checked + .slider:before {
         font-size: 12px;
     }
     
-    /* 表格 */
+    /* 表格 - 进一步优化 */
     .schedule-table {
-        min-width: 550px;
+        min-width: 100% !important;
     }
     
     .schedule-table th,
     .schedule-table td {
-        padding: 10px 8px;
-        font-size: 12px;
+        padding: 10px 6px !important;
+        font-size: 11px !important;
+    }
+    
+    .col-time { 
+        width: 30% !important;
+        min-width: 100px !important;
+        max-width: 100px !important;
+    }
+    .col-status { 
+        width: 20% !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+    }
+    .col-admin { 
+        width: 25% !important;
+        min-width: 80px !important;
+        max-width: 80px !important;
+    }
+    .col-actions { 
+        width: 25% !important;
+        min-width: 90px !important;
+        max-width: 90px !important;
     }
     
     /* 按钮调整 */
@@ -1633,23 +1673,40 @@ input:checked + .slider:before {
     
     /* 表格进一步优化 */
     .schedule-table {
-        min-width: 500px;
+        min-width: 100% !important;
     }
     
     .schedule-table th,
     .schedule-table td {
-        padding: 8px 6px;
-        font-size: 11px;
+        padding: 8px 4px !important;
+        font-size: 10px !important;
     }
     
-    .col-time { min-width: 150px; }
-    .col-status { min-width: 80px; }
-    .col-admin { min-width: 120px; }
-    .col-actions { min-width: 100px; }
+    .col-time { 
+        width: 30% !important;
+        min-width: 90px !important;
+        max-width: 90px !important;
+    }
+    .col-status { 
+        width: 20% !important;
+        min-width: 45px !important;
+        max-width: 45px !important;
+    }
+    .col-admin { 
+        width: 25% !important;
+        min-width: 70px !important;
+        max-width: 70px !important;
+    }
+    .col-actions { 
+        width: 25% !important;
+        min-width: 80px !important;
+        max-width: 80px !important;
+    }
     
     .status-cell {
-        font-size: 10px;
+        font-size: 9px;
         padding: 3px 6px;
+        min-width: 40px;
     }
     
     /* 统计徽章 */
@@ -1949,3 +2006,4 @@ input:checked + .slider:before {
         display: none; /* 在小屏幕上隐藏 */
     }
 }
+[file content end]

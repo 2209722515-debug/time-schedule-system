@@ -1,3 +1,5 @@
+[file name]: script.js
+[file content begin]
 // ============================================
 // 时间管理系统 - GitHub云同步版（所有管理员均可配置Token）
 // ============================================
@@ -79,12 +81,32 @@ document.addEventListener('DOMContentLoaded', function() {
     initSync();
     checkForScrollHint();
     
+    // 绑定管理员设置按钮事件
+    bindAdminSettingsButton();
+    
     setTimeout(() => {
         if (syncEnabled && isOnline) {
             checkAndSync();
         }
     }, 2000);
 });
+
+// 绑定管理员设置按钮事件
+function bindAdminSettingsButton() {
+    const adminSettingsBtn = document.getElementById('adminSettingsBtn');
+    if (adminSettingsBtn) {
+        // 移除旧的事件监听器
+        const newBtn = adminSettingsBtn.cloneNode(true);
+        adminSettingsBtn.parentNode.replaceChild(newBtn, adminSettingsBtn);
+        
+        // 添加新的事件监听器
+        document.getElementById('adminSettingsBtn').addEventListener('click', function() {
+            openAdminSettings();
+        });
+        
+        console.log('管理员设置按钮事件绑定成功');
+    }
+}
 
 function initToastr() {
     // 添加toastr安全性检查
@@ -240,6 +262,7 @@ function initUI() {
     // 修复：确保按钮事件正确绑定
     setTimeout(() => {
         rebindButtonEvents();
+        bindAdminSettingsButton(); // 确保管理员设置按钮绑定
     }, 500);
 }
 
@@ -1310,11 +1333,40 @@ function optimizeTableForMobile() {
     if (!table) return;
     
     if (window.innerWidth <= 768) {
+        // 使用固定布局，防止内容溢出
+        table.style.tableLayout = 'fixed';
         table.style.fontSize = '12px';
-        table.style.minWidth = '550px';
+        table.style.minWidth = '100%';
+        
+        // 设置列宽
+        const ths = table.querySelectorAll('th');
+        const tds = table.querySelectorAll('td');
+        
+        if (ths.length >= 4) {
+            ths[0].style.width = '30%';
+            ths[1].style.width = '20%';
+            ths[2].style.width = '25%';
+            ths[3].style.width = '25%';
+        }
+        
+        // 确保单元格内容不换行，使用省略号
+        tds.forEach(td => {
+            td.style.whiteSpace = 'nowrap';
+            td.style.overflow = 'hidden';
+            td.style.textOverflow = 'ellipsis';
+        });
     } else {
+        table.style.tableLayout = 'auto';
         table.style.fontSize = '';
         table.style.minWidth = '600px';
+        
+        // 恢复默认样式
+        const tds = table.querySelectorAll('td');
+        tds.forEach(td => {
+            td.style.whiteSpace = '';
+            td.style.overflow = '';
+            td.style.textOverflow = '';
+        });
     }
 }
 
@@ -1521,6 +1573,11 @@ function updateUserUI() {
         alertMessage.textContent = `管理员模式 - ${currentAdmin.name}`;
         systemAlert.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
         
+        // 重新绑定管理员设置按钮
+        setTimeout(() => {
+            bindAdminSettingsButton();
+        }, 100);
+        
     } else {
         navUser.innerHTML = `
             <button class="btn btn-primary" onclick="showLoginModal()">
@@ -1572,9 +1629,15 @@ function loadSchedules() {
         
         const adminName = schedule.adminName || '未知管理员';
         
+        // 手机端优化：缩短显示内容
+        let displayAdminName = adminName;
+        if (isMobile && adminName.length > 8) {
+            displayAdminName = adminName.substring(0, 6) + '...';
+        }
+        
         html += `
             <tr>
-                <td data-label="时间段">
+                <td data-label="时间段" title="${schedule.startTime} - ${schedule.endTime}">
                     <strong>${schedule.startTime} - ${schedule.endTime}</strong>
                 </td>
                 <td data-label="状态">
@@ -1582,13 +1645,13 @@ function loadSchedules() {
                         ${schedule.status === 'free' ? '空闲' : '繁忙'}
                     </span>
                 </td>
-                <td data-label="设置人" class="admin-cell">
+                <td data-label="设置人" class="admin-cell" title="${adminName}">
                     <i class="fas fa-user-circle"></i>
-                    <span>${adminName}</span>
+                    <span>${displayAdminName}</span>
                 </td>
                 <td data-label="操作" class="action-buttons">
                     ${currentAdmin ? `
-                        <button onclick="deleteSchedule(${index})" class="btn btn-danger btn-sm">
+                        <button onclick="deleteSchedule(${index})" class="btn btn-danger btn-sm" title="删除">
                             <i class="fas fa-trash"></i> ${isMobile ? '' : '删除'}
                         </button>
                     ` : '<span class="text-muted">（仅管理员可操作）</span>'}
@@ -1603,6 +1666,7 @@ function loadSchedules() {
     
     setTimeout(() => {
         checkForScrollHint();
+        optimizeTableForMobile(); // 确保表格优化
     }, 100);
 }
 
@@ -1793,6 +1857,8 @@ function hideSyncSettings() {
 // ============================================
 
 function openAdminSettings() {
+    console.log('打开管理员设置');
+    
     if (!currentAdmin) {
         showMessage('请先登录管理员账号', 'warning');
         return;
@@ -1814,6 +1880,10 @@ function openAdminSettings() {
         setTimeout(() => {
             if (editAdminNameEl) editAdminNameEl.focus();
         }, 100);
+        
+        console.log('管理员设置模态框已打开');
+    } else {
+        console.error('管理员设置模态框未找到');
     }
 }
 
@@ -2450,6 +2520,7 @@ window.addEventListener('load', function() {
     
     setTimeout(() => {
         updateTableLayout();
+        optimizeTableForMobile();
     }, 1000);
 });
 
@@ -2510,8 +2581,11 @@ console.log('时间管理系统初始化完成，版本：GitHub云同步版 v2.
 console.log('GitHub仓库：', CONFIG.github.rawUrl);
 console.log('Token状态：', githubToken ? '已配置' : '未配置');
 console.log('修复内容：');
-console.log('1. Token保存防重复点击');
-console.log('2. Token空值检查');
-console.log('3. toastr安全性检查');
-console.log('4. 全局Token变量同步修复');
-console.log('5. 按钮事件绑定修复');
+console.log('1. 管理员设置按钮事件绑定修复');
+console.log('2. 移动端表格显示优化');
+console.log('3. Token保存防重复点击');
+console.log('4. Token空值检查');
+console.log('5. toastr安全性检查');
+console.log('6. 全局Token变量同步修复');
+console.log('7. 按钮事件绑定修复');
+[file content end]

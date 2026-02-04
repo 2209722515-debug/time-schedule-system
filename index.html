@@ -1,3 +1,5 @@
+[file name]: index.html
+[file content begin]
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -13,6 +15,47 @@
             .mobile-optimized {
                 width: 100% !important;
                 overflow-x: auto !important;
+            }
+            
+            /* 修复表格显示不全问题 */
+            .schedule-table {
+                min-width: 100% !important;
+                table-layout: fixed;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 10px 5px !important;
+                font-size: 12px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .col-time {
+                width: 120px !important;
+                min-width: 120px !important;
+            }
+            
+            .col-status {
+                width: 60px !important;
+                min-width: 60px !important;
+            }
+            
+            .col-admin {
+                width: 100px !important;
+                min-width: 100px !important;
+            }
+            
+            .col-actions {
+                width: 120px !important;
+                min-width: 120px !important;
+            }
+            
+            .action-buttons .btn {
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                min-width: 60px;
             }
         }
         
@@ -165,7 +208,7 @@
                     <button class="btn btn-sm btn-outline" onclick="openSyncSettings()">
                         <i class="fas fa-sync-alt"></i> 同步设置
                     </button>
-                    <button class="btn btn-sm btn-outline" onclick="openAdminSettings()">
+                    <button class="btn btn-sm btn-outline" id="adminSettingsBtn">
                         <i class="fas fa-cog"></i> 管理设置
                     </button>
                     <button class="btn btn-sm btn-success" onclick="configureGitHubToken()" id="configureTokenBtn">
@@ -678,5 +721,47 @@
     <!-- 脚本引入 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // 修复管理员设置按钮事件绑定
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为管理设置按钮添加事件监听
+            const adminSettingsBtn = document.getElementById('adminSettingsBtn');
+            if (adminSettingsBtn) {
+                adminSettingsBtn.addEventListener('click', function() {
+                    openAdminSettings();
+                });
+            }
+            
+            // 初始化表格宽度
+            setTimeout(() => {
+                optimizeTableForMobile();
+            }, 500);
+        });
+        
+        function optimizeTableForMobile() {
+            if (window.innerWidth <= 768) {
+                const table = document.querySelector('.schedule-table');
+                if (table) {
+                    // 设置固定表格布局，防止内容溢出
+                    table.style.tableLayout = 'fixed';
+                    
+                    // 设置列宽
+                    const cols = table.querySelectorAll('th');
+                    if (cols.length >= 4) {
+                        cols[0].style.width = '30%';
+                        cols[1].style.width = '20%';
+                        cols[2].style.width = '25%';
+                        cols[3].style.width = '25%';
+                    }
+                }
+            }
+        }
+        
+        // 窗口大小改变时重新优化表格
+        window.addEventListener('resize', function() {
+            optimizeTableForMobile();
+        });
+    </script>
 </body>
 </html>
+[file content end]
