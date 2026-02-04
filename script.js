@@ -254,7 +254,7 @@ function initUI() {
     console.log('初始化UI...');
     initDatePicker();
     setToday();
-    updateUserUI();
+    updateUserUI();  // 确保先更新用户UI
     loadSchedules();
     updateSyncUI();
     updateTokenStatusUI();
@@ -1553,12 +1553,15 @@ function updateUserUI() {
     const systemAlert = document.getElementById('systemAlert');
     const alertMessage = document.getElementById('alertMessage');
     
+    console.log('更新用户UI，currentAdmin:', currentAdmin);
+    
     if (!navUser || !adminCard || !systemAlert || !alertMessage) {
         console.error('UI元素未找到');
         return;
     }
     
     if (currentAdmin) {
+        console.log('显示已登录状态');
         navUser.innerHTML = `
             <span class="admin-indicator">
                 <i class="fas fa-user-shield"></i>
@@ -1579,6 +1582,7 @@ function updateUserUI() {
         }, 100);
         
     } else {
+        console.log('显示未登录状态');
         navUser.innerHTML = `
             <button class="btn btn-primary" onclick="showLoginModal()">
                 <i class="fas fa-sign-in-alt"></i> 管理员登录
@@ -2521,6 +2525,8 @@ window.addEventListener('load', function() {
     setTimeout(() => {
         updateTableLayout();
         optimizeTableForMobile();
+        // 确保登录按钮显示
+        updateUserUI();
     }, 1000);
 });
 
@@ -2588,4 +2594,5 @@ console.log('4. Token空值检查');
 console.log('5. toastr安全性检查');
 console.log('6. 全局Token变量同步修复');
 console.log('7. 按钮事件绑定修复');
+console.log('8. 登录按钮显示修复');
 [file content end]
