@@ -1,6 +1,5 @@
 // ============================================
 // 时间管理系统 - GitHub云同步版（所有管理员均可配置Token）
-// 修复版：管理设置按钮点击无效问题修复
 // ============================================
 
 // 配置
@@ -79,9 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initKeyboardSupport();
     initSync();
     checkForScrollHint();
-    
-    // 添加全局事件监听
-    setupGlobalEventListeners();
     
     setTimeout(() => {
         if (syncEnabled && isOnline) {
@@ -244,65 +240,7 @@ function initUI() {
     // 修复：确保按钮事件正确绑定
     setTimeout(() => {
         rebindButtonEvents();
-        setupAdminSettingsButton();
-        setupGlobalClickHandlers();
     }, 500);
-}
-
-function setupGlobalEventListeners() {
-    console.log('设置全局事件监听器...');
-    
-    // 全局点击事件委托处理
-    document.addEventListener('click', function(event) {
-        const button = event.target.closest('button');
-        if (!button) return;
-        
-        // 调试信息
-        console.log('全局点击事件捕获，按钮文本:', button.textContent, '按钮ID:', button.id);
-        
-        // 管理设置按钮处理
-        if (button.id === 'adminSettingsBtn' || 
-            button.textContent.includes('管理设置') ||
-            (button.innerHTML && button.innerHTML.includes('管理设置'))) {
-            console.log('捕获到管理设置按钮点击');
-            event.preventDefault();
-            event.stopPropagation();
-            openAdminSettings();
-            return;
-        }
-    });
-    
-    console.log('全局事件监听器设置完成');
-}
-
-function setupGlobalClickHandlers() {
-    console.log('设置全局点击处理器...');
-    
-    // 专门处理管理设置按钮
-    const adminSettingsBtn = document.getElementById('adminSettingsBtn');
-    if (adminSettingsBtn) {
-        console.log('找到管理设置按钮，添加事件监听');
-        
-        // 移除旧的监听器
-        const newBtn = adminSettingsBtn.cloneNode(true);
-        adminSettingsBtn.parentNode.replaceChild(newBtn, adminSettingsBtn);
-        
-        // 添加新的监听器
-        newBtn.addEventListener('click', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            console.log('管理设置按钮被点击（直接监听）');
-            openAdminSettings();
-        });
-        
-        // 同时保留原始的onclick
-        newBtn.onclick = function(event) {
-            event.preventDefault();
-            openAdminSettings();
-        };
-        
-        console.log('✅ 管理设置按钮事件绑定完成');
-    }
 }
 
 function initDatePicker() {
@@ -1855,50 +1793,28 @@ function hideSyncSettings() {
 // ============================================
 
 function openAdminSettings() {
-    console.log('openAdminSettings函数被调用');
-    
     if (!currentAdmin) {
-        console.log('未登录，无法打开管理员设置');
         showMessage('请先登录管理员账号', 'warning');
         return;
     }
     
     const modal = document.getElementById('adminSettingsModal');
-    if (!modal) {
-        console.error('找不到管理员设置模态框');
-        showMessage('界面加载异常，请刷新页面', 'error');
-        return;
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        const currentAccountEl = document.getElementById('currentAccount');
+        const editAdminNameEl = document.getElementById('editAdminName');
+        
+        if (currentAccountEl) currentAccountEl.textContent = currentAdmin.username;
+        if (editAdminNameEl) editAdminNameEl.value = currentAdmin.name;
+        
+        loadAdminList();
+        
+        setTimeout(() => {
+            if (editAdminNameEl) editAdminNameEl.focus();
+        }, 100);
     }
-    
-    console.log('显示模态框');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // 设置当前账号信息
-    const currentAccountEl = document.getElementById('currentAccount');
-    const editAdminNameEl = document.getElementById('editAdminName');
-    
-    if (currentAccountEl) {
-        currentAccountEl.textContent = currentAdmin.username;
-        console.log('设置账号:', currentAdmin.username);
-    }
-    if (editAdminNameEl) {
-        editAdminNameEl.value = currentAdmin.name;
-        console.log('设置昵称:', currentAdmin.name);
-    }
-    
-    // 加载管理员列表
-    loadAdminList();
-    
-    // 显示调试信息
-    console.log('模态框状态:', modal.style.display);
-    console.log('模态框是否存在:', modal !== null);
-    
-    setTimeout(() => {
-        if (editAdminNameEl) {
-            editAdminNameEl.focus();
-        }
-    }, 100);
 }
 
 function hideAdminSettings() {
@@ -1914,44 +1830,6 @@ function hideAdminSettings() {
             }
         });
     }
-}
-
-function setupAdminSettingsButton() {
-    console.log('设置管理设置按钮事件...');
-    
-    // 方法1：使用事件委托
-    document.addEventListener('click', function(event) {
-        const button = event.target.closest('button');
-        if (!button) return;
-        
-        // 检查是否是管理设置按钮
-        const isAdminSettingsBtn = button.textContent.includes('管理设置') || 
-                                  (button.innerHTML && button.innerHTML.includes('管理设置'));
-        
-        if (isAdminSettingsBtn) {
-            event.preventDefault();
-            event.stopPropagation();
-            console.log('通过事件委托捕获管理设置按钮点击');
-            openAdminSettings();
-            return;
-        }
-    });
-    
-    // 方法2：直接绑定
-    const adminSettingsBtn = document.getElementById('adminSettingsBtn');
-    if (adminSettingsBtn) {
-        console.log('直接绑定管理设置按钮事件');
-        
-        // 添加点击事件监听
-        adminSettingsBtn.addEventListener('click', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            console.log('直接监听器捕获管理设置按钮点击');
-            openAdminSettings();
-        });
-    }
-    
-    console.log('管理设置按钮事件设置完成');
 }
 
 function updateAdminName() {
@@ -2636,6 +2514,4 @@ console.log('1. Token保存防重复点击');
 console.log('2. Token空值检查');
 console.log('3. toastr安全性检查');
 console.log('4. 全局Token变量同步修复');
-console.log('5. 管理设置按钮点击问题修复');
-console.log('6. 添加了全局事件监听器');
-console.log('7. 增强按钮事件绑定机制');
+console.log('5. 按钮事件绑定修复');
